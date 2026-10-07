@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f2a44">
+<title>Memoria Sapientia</title>
+<style>
+:root{
+  --bg:#f6f3ec; --card:#fffdf8; --ink:#1d2433; --sub:#5d6475; --mute:#9097a6; --line:#e4ded1;
+  --accent:#2f4a8a; --accent-ink:#fff; --accent-soft:#e6ebf6;
+  --ok:#2e7d55; --ok-soft:#e3f2ea; --ng:#b4423a; --ng-soft:#f8e5e2; --warn:#a96b10; --warn-soft:#fbefd9;
+  --heat0:#ebe6da; --heat1:#c9d3ea; --heat2:#93a7d6; --heat3:#5b78bd; --heat4:#2f4a8a;
+  --serif:"Noto Serif JP","Yu Mincho","YuMincho","Hiragino Mincho ProN",serif;
+  --sans:system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI","Meiryo","Noto Sans JP",sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#13161d; --card:#1b1f29; --ink:#e7e9ef; --sub:#a6adbd; --mute:#6f7688; --line:#2c3240;
+    --accent:#8ea8e8; --accent-ink:#121622; --accent-soft:#232c42;
+    --ok:#62c393; --ok-soft:#1c3328; --ng:#ee8a80; --ng-soft:#3a2220; --warn:#e7b25a; --warn-soft:#3a2d17;
+    --heat0:#232834; --heat1:#2b3a5c; --heat2:#3f5893; --heat3:#6683c9; --heat4:#9db3ee;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 96px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-family:var(--serif);font-size:20px;margin:0;letter-spacing:.02em}
+.brand small{color:var(--mute);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card h2{font-size:13px;font-weight:700;color:var(--sub);margin:0 0 12px;letter-spacing:.04em}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 14px;font-weight:600;transition:transform .08s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.big{width:100%;padding:16px;font-size:17px;border-radius:12px}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--ng)}
+.btn:disabled{opacity:.45;cursor:default}
+.muted{color:var(--mute)} .sub{color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.kpi b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi span{font-size:12px;color:var(--sub)}
+.modes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.modes .btn{text-align:left;padding:12px}
+.modes .btn small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.bar{height:10px;border-radius:6px;background:var(--heat0);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--sub);margin-top:8px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;background:var(--c)}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px;overflow-x:auto}
+.heat i{width:13px;height:13px;border-radius:3px;background:var(--heat0);display:block}
+.catrow{display:grid;grid-template-columns:7.5em 1fr 5.5em;gap:10px;align-items:center;font-size:13px;padding:4px 0}
+.catrow .bar{height:8px}
+.catrow em{font-style:normal;white-space:nowrap;text-align:right;color:var(--sub);font-variant-numeric:tabular-nums}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav.tabs button{flex:1;max-width:190px;border:0;background:none;padding:10px 4px 9px;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button.on{color:var(--accent);font-weight:700}
+nav.tabs svg{width:22px;height:22px}
+/* quiz */
+.qhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.prog{flex:1;height:6px;background:var(--heat0);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.chip{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.ng{background:var(--ng-soft);color:var(--ng)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.qtext{font-family:var(--serif);font-size:19px;line-height:1.75;margin:12px 0 18px;font-weight:600}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:13px 14px;font-weight:600;font-size:16px;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{flex:none;width:24px;height:24px;border-radius:6px;background:var(--accent-soft);color:var(--accent);font-size:13px;display:grid;place-items:center;font-family:var(--sans)}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--ng);background:var(--ng-soft)}
+.opt.dim{opacity:.5}
+.opt:disabled{cursor:default}
+.recall{border:1.5px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--sub)}
+.fb{margin-top:16px;border-radius:12px;padding:16px;border:1px solid var(--line);animation:up .25s ease-out}
+.fb.ok{background:var(--ok-soft);border-color:transparent}
+.fb.ng{background:var(--ng-soft);border-color:transparent}
+.fb h3{margin:0 0 6px;font-size:15px}
+.fb p{margin:4px 0}
+.fb details{margin-top:8px;font-size:13px}
+.fb details li{margin:4px 0}
+.gradebar{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.gradebar .btn{flex:1;min-width:130px}
+.gradebar .btn small{display:block;font-weight:400;font-size:11px;opacity:.8}
+.hintbox{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:14px}
+kbd{font-family:ui-monospace,monospace;font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--sub);background:var(--card)}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* lists */
+.qlist{display:flex;flex-direction:column}
+.qitem{border-top:1px solid var(--line);padding:11px 2px;cursor:pointer}
+.qitem:first-child{border-top:0}
+.qitem .t{font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qitem .m{font-size:12px;color:var(--sub);display:flex;gap:10px;flex-wrap:wrap;margin-top:3px}
+.qitem.open .t{-webkit-line-clamp:unset}
+.qdetail{margin-top:8px;font-size:13px;cursor:default}
+.qdetail ol{padding-left:1.4em;margin:6px 0}
+input[type=text],input[type=number],select,textarea{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px;width:100%}
+textarea{font-family:ui-monospace,Consolas,monospace;font-size:12px;min-height:150px;resize:vertical}
+label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:13px;color:var(--sub);background:var(--accent-soft);padding:10px 12px;border-radius:10px}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.result-score{font-family:var(--serif);font-size:44px;font-weight:700;text-align:center;margin:6px 0 0}
+.rlist li{margin:6px 0;font-size:14px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
+.switch input{width:22px;height:22px}
+.hide{display:none!important}
+@media (max-width:520px){
+  .qtext{font-size:17.5px}
+  .modes{grid-template-columns:1fr 1fr}
+  .catrow{grid-template-columns:6.5em 1fr 5.2em}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Memoria Sapientia</h1><small>博識クイズ</small></div>
+    <span id="hdrStreak" class="chip"></span>
+  </header>
+
+  <!-- HOME -->
+  <section id="v-home">
+    <div class="kpis">
+      <div class="kpi"><b id="kStreak">0</b><span>連続日数</span></div>
+      <div class="kpi"><b id="kToday">0</b><span>今日解いた問題</span></div>
+      <div class="kpi"><b id="kAcc">–</b><span>30日の正答率</span></div>
+    </div>
+    <div class="card">
+      <button class="btn primary big" id="btnDaily">今日の学習を始める</button>
+      <p class="sub" id="dailyInfo" style="margin:10px 2px 0;font-size:13px"></p>
+      <div class="modes">
+        <button class="btn" data-mode="weak">苦手特訓<small>間違えた問題を重点的に</small></button>
+        <button class="btn" data-mode="random">ランダム<small>全問題からシャッフル</small></button>
+        <button class="btn" data-mode="cat">カテゴリ別<small id="catPickLabel">分野を選んで出題</small></button>
+        <button class="btn" data-mode="latest">最新トピック<small>時点つきの問題だけ</small></button>
+      </div>
+      <select id="catPick" class="hide" style="margin-top:10px"></select>
+    </div>
+    <div id="backupNote"></div>
+    <div class="card">
+      <h2>習得状況</h2>
+      <div class="bar" id="masteryBar"></div>
+      <div class="legend" id="masteryLegend"></div>
+    </div>
+    <div class="card">
+      <h2>学習の記録（直近18週）</h2>
+      <div class="heat" id="heat"></div>
+    </div>
+    <div class="card">
+      <h2>分野別の正答率</h2>
+      <div id="catStats"></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="v-quiz" class="hide">
+    <div class="qhead">
+      <button class="btn small ghost" id="quitBtn" title="中断">✕</button>
+      <div class="prog"><i id="progBar"></i></div>
+      <span class="muted" id="progText" style="font-size:13px;font-variant-numeric:tabular-nums"></span>
+    </div>
+    <div class="card">
+      <div class="row" id="qMeta"></div>
+      <div class="qtext" id="qText"></div>
+      <div id="qBody"></div>
+      <div id="qHint"></div>
+      <div id="qFb"></div>
+    </div>
+    <p class="muted" style="font-size:12px;text-align:center" id="kbdHelp"><kbd>1</kbd>–<kbd>4</kbd> 選択　<kbd>H</kbd> ヒント　<kbd>Space</kbd> 選択肢を表示　<kbd>Enter</kbd> 次へ</p>
+  </section>
+
+  <!-- RESULT -->
+  <section id="v-result" class="hide">
+    <div class="card">
+      <h2>セッション結果</h2>
+      <div class="result-score" id="rScore"></div>
+      <p class="sub" style="text-align:center;margin-top:0" id="rSub"></p>
+      <ul class="rlist" id="rList" style="padding-left:1.2em"></ul>
+      <div class="row" style="margin-top:12px">
+        <button class="btn grow" id="rHome">ホームへ</button>
+        <button class="btn primary grow" id="rAgain">続けてもう1セット</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="v-lib" class="hide">
+    <div class="card">
+      <div class="grid2">
+        <input type="text" id="libSearch" placeholder="問題文・答えで検索">
+        <div class="row" style="flex-wrap:nowrap">
+          <select id="libCat"></select>
+          <select id="libStatus">
+            <option value="all">すべて</option>
+            <option value="weak">苦手</option>
+            <option value="new">未出題</option>
+            <option value="mastered">習得済み</option>
+            <option value="flag">疑義あり</option>
+            <option value="custom">追加した問題</option>
+          </select>
+        </div>
+      </div>
+      <p class="muted" style="font-size:12px;margin:10px 0 0" id="libCount"></p>
+    </div>
+    <div class="card"><div class="qlist" id="libList"></div></div>
+  </section>
+
+  <!-- ADD -->
+  <section id="v-add" class="hide">
+    <div class="card">
+      <h2>① 問題作成プロンプトをコピー</h2>
+      <div class="grid2">
+        <div><label class="f">問題数</label>
+          <select id="pCount"><option>10</option><option selected>20</option><option>30</option></select></div>
+        <div><label class="f">分野</label><select id="pCat"></select></div>
+        <div><label class="f">重点</label>
+          <select id="pFocus">
+            <option value="std">標準（教養全般）</option>
+            <option value="latest">最新の知見・時事（直近2〜3年）</option>
+            <option value="weak">苦手分野を強化</option>
+            <option value="deep">既存の問題の関連知識を深掘り</option>
+          </select></div>
+        <div><label class="f">難易度</label>
+          <select id="pLevel"><option value="上級">上級（教養人レベル）</option><option value="超・上級" selected>超・上級</option><option value="標準">標準（一般常識）</option></select></div>
+      </div>
+      <p class="note" style="margin-top:12px" id="pNote"></p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary grow" id="pCopy">作成プロンプトをコピー</button>
+        <button class="btn grow" id="pCopyCheck">検証用プロンプトをコピー</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin:8px 2px 0">検証用プロンプト：作られたJSONを別のAI（または別チャット）に渡して、事実誤りや正解の重複をチェックしてもらうためのものです。</p>
+    </div>
+    <div class="card">
+      <h2>② AIが出力したJSONを貼り付けて取り込み</h2>
+      <textarea id="impText" placeholder='{"questions":[ ... ]}  ← コードブロックごと貼り付けてもOK。旧Gemini形式もそのまま読めます'></textarea>
+      <div class="grid2" style="margin-top:10px">
+        <div><label class="f">分野が指定されていない問題の分野</label><select id="impDefCat"></select></div>
+        <div style="align-self:end"><button class="btn grow" id="impCheck" style="width:100%">内容を確認</button></div>
+      </div>
+      <div id="impPreview" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="v-set" class="hide">
+    <div class="card">
+      <h2>学習設定</h2>
+      <div class="grid2">
+        <div><label class="f">1セットの問題数</label><input type="number" id="sSize" min="5" max="50"></div>
+        <div><label class="f">1日の新規問題の上限</label><input type="number" id="sNew" min="0" max="100"></div>
+      </div>
+      <div class="switch"><div><b>想起モード</b><div class="muted" style="font-size:12px">選択肢を隠し、まず自力で答えを思い出してから表示します。記憶の定着に効果的です。</div></div><input type="checkbox" id="sRecall"></div>
+      <div class="switch"><div><b>ヒントを見たら「あやふや」扱い</b><div class="muted" style="font-size:12px">ヒントで正解した問題は次回の出題間隔を短くします。</div></div><input type="checkbox" id="sHintHard"></div>
+    </div>
+    <div class="card">
+      <h2>バックアップ</h2>
+      <p class="sub" style="font-size:13px;margin-top:0">学習記録と追加した問題は、このブラウザ内にだけ保存されています。ブラウザのデータ削除で消えるので、定期的に書き出してください。別の端末へ移すときもこのファイルを使います。</p>
+      <div class="row">
+        <button class="btn primary grow" id="bExport">バックアップを書き出す</button>
+        <label class="btn grow" style="text-align:center">バックアップから復元<input type="file" id="bImport" accept=".json,application/json" class="hide"></label>
+      </div>
+      <p class="muted" style="font-size:12px" id="bLast"></p>
+    </div>
+    <div class="card">
+      <h2>リセット</h2>
+      <div class="row">
+        <button class="btn danger grow" id="rstProgress">学習記録だけ消す</button>
+        <button class="btn danger grow" id="rstAll">すべて初期化</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:12px;text-align:center">収録 <span id="verInfo"></span></p>
+  </section>
+</div>
+
+<nav class="tabs">
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>ホーム</button>
+  <button data-tab="lib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>問題一覧</button>
+  <button data-tab="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>問題を追加</button>
+  <button data-tab="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>設定</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const BANK = [{"id": "g11-01", "cat": "世界史", "q": "1648年に締結され、中世の「普遍的権威」から脱却し、各国家が主権を持つ近代国際秩序の基礎となった条約は何ですか？", "a": [{"t": "ウェストファリア条約", "r": "三十年戦争の講和条約であり、神聖ローマ帝国の実質的な解体と各領邦の主権確立をもたらし近代国際秩序の起点となりました。"}, {"t": "ユトレヒト条約", "r": "1713年にスペイン継承戦争を終結させた条約であり、勢力均衡の原則は含まれますが近代主権国家体制の直接の起源ではありません。"}, {"t": "トルデシリャス条約", "r": "スペインとポルトガルが世界の分割境界を定めた条約であり、主権概念の確立が主眼ではありません。"}, {"t": "ベルサイユ条約", "r": "第一次世界大戦の講和条約であり、近代の主権概念成立時期とは大きく異なります。"}], "hint": "近代国際法の出発点として、歴史学や政治学で必ず言及される条約です。", "src": "Gemini Part 11"}, {"id": "g11-02", "cat": "科学", "q": "物理学において、微小な粒子が観測されるまで複数の状態を重ね合わせた状態で存在するという解釈を、箱の中の猫で例えた思考実験を何といいますか？", "a": [{"t": "シュレーディンガーの猫", "r": "観測によって状態が一つに決まるというコペンハーゲン解釈の奇妙さを批判的に提示した実験です。"}, {"t": "マックスウェルの悪魔", "r": "熱力学第二法則（エントロピー増大）に関連する思考実験であり、量子状態の重ね合わせとは異なります。"}, {"t": "ラプラスの悪魔", "r": "全原子の運動を把握すれば未来を予言できるという決定論的な思考モデルです。"}, {"t": "ゼノンのパラドックス", "r": "「アキレスと亀」など、運動や無限に関する古代ギリシャの論理的難問です。"}], "hint": "オーストリアの物理学者が、量子力学の不自然さを指摘するために考案しました。", "src": "Gemini Part 11"}, {"id": "g11-03", "cat": "文学", "q": "ジェイムズ・ジョイスの代表作で、ダブリンの一日の出来事をホメロスの叙事詩に対応させて描いた、意識の流れの手法を用いた小説は？", "a": [{"t": "ユリシーズ", "r": "レオポルド・ブルームの遍歴を通じて、神話と現代の平凡な日常を高度に融合させた20世紀文学の金字塔です。"}, {"t": "フィネガンズ・ウェイク", "r": "多言語が混在し、円環的な物語構造を持つジョイスのさらに難解な晩年の著作です。"}, {"t": "若き芸術家の肖像", "r": "スティーヴン・ディーダラスの成長を描いた自伝的小説ですが、叙事詩的構造は持ちません。"}, {"t": "ダブリン市民", "r": "ダブリンの人々の閉塞感を描いた短編集であり、長編の叙事詩的枠組みは使われていません。"}], "hint": "タイトルは、オデュッセウスのラテン語名に由来しています。", "src": "Gemini Part 11"}, {"id": "g11-04", "cat": "芸術・音楽", "q": "印象派のモネが、光の加減による表情の変化を捉えるために同じ主題を異なる時間帯に何度も描いた連作のうち、石造りの聖堂を主題としたものは？", "a": [{"t": "ルーアン大聖堂", "r": "朝の光、夕暮れ、曇天など、時間の経過による色彩と光の変化を徹底的に追求した連作です。"}, {"t": "サン・ラザール駅", "r": "近代的な駅の蒸気や光を描いた連作ですが、聖堂が主題ではありません。"}, {"t": "積みわら", "r": "農村の風景を題材とした連作であり、建築物ではありません。"}, {"t": "ポプラ並木", "r": "水辺の樹木を主題とした連作です。"}], "hint": "フランスのノルマンディー地方にある歴史的な大聖堂です。", "src": "Gemini Part 11"}, {"id": "g11-05", "cat": "経済・社会", "q": "地政学において、イギリスのマッキンダーが提唱した、ユーラシア大陸の中央部を支配する者が世界を支配するという概念を何といいますか？", "a": [{"t": "ハートランド", "r": "海軍力が及ばない内陸の重要拠点（主にロシア周辺）を指し、この地域の支配が大国化の鍵であると説きました。"}, {"t": "リムランド", "r": "スパイクマンが提唱した、ハートランドを取り囲む沿岸地域を重視する概念です。"}, {"t": "シーパワー", "r": "マハンが提唱した、海洋の支配が国家の繁栄をもたらすとする概念です。"}, {"t": "生存圏（レベンスラウム）", "r": "ハウスホーファーらが提唱し、後にナチスの拡張主義に利用された概念です。"}], "hint": "「心臓部」を意味する英語です。", "src": "Gemini Part 11"}, {"id": "g11-06", "cat": "経済・社会", "q": "経済学において、ある財の価格が上昇した際、実質的な所得が減少したように感じて消費が変化する効果を何といいますか？", "a": [{"t": "所得効果", "r": "価格変動がもたらす購買力の変化が、需要量に与える影響のことです。"}, {"t": "代替効果", "r": "相対的な価格の変化により、高い財を避けて安い代替品を選ぶようになる効果です。"}, {"t": "ヴェブレン効果", "r": "価格が高いほど見せびらかしの欲求が満たされ、需要が増える特殊な現象です。"}, {"t": "スノッブ効果", "r": "他人の消費が増えるほど、自分は特別なものを持ちたいとして需要が減る心理的効果です。"}], "hint": "実質的な収入（購買力）の変動に焦点を当てた用語です。", "src": "Gemini Part 11"}, {"id": "g11-07", "cat": "芸術・音楽", "q": "室町時代に世阿弥が著した、能の奥義を説いた日本最古の演劇論書は何ですか？", "a": [{"t": "風姿花伝", "r": "「初心忘るべからず」などの言葉で知られ、修行の段階と美の極意を説いた芸術論の傑作です。"}, {"t": "花鏡", "r": "世阿弥の晩年の著作であり、風姿花伝をさらに深化させた内容ですが、最古の代表作は風姿花伝です。"}, {"t": "申楽談儀", "r": "世阿弥の教えを次男の元能が書き留めたものであり、世阿弥本人の直接の著書とは区別されます。"}, {"t": "正法眼蔵", "r": "鎌倉時代の僧・道元による仏教書であり、演劇論ではありません。"}], "hint": "「花」を重要な概念として用いています。", "src": "Gemini Part 11"}, {"id": "g11-08", "cat": "科学", "q": "化学において、化学反応の前後で反応に関与する物質の総質量は変化しないという法則を何といいますか？", "a": [{"t": "質量保存の法則", "r": "ラヴォアジエが精密な実験によって証明した、近代化学の基礎となる重要な法則です。"}, {"t": "定比例の法則", "r": "化合物を作る成分元素の質量比は常に一定であるという法則です。"}, {"t": "倍数比例の法則", "r": "ドルトンが提唱した、元素が複数の化合物を作る際の質量比に関する法則です。"}, {"t": "アボガドロの法則", "r": "同温同圧同体積の気体は同数の分子を含むという法則であり、質量不変とは異なります。"}], "hint": "フランスの化学者ラヴォアジエが、燃焼の実験などを通じて確立しました。", "src": "Gemini Part 11"}, {"id": "g11-09", "cat": "哲学・宗教", "q": "18世紀ドイツの哲学者カントが、認識の限界を問い、主観が客観を構成するという「コペルニクス的転回」を示した主著は何ですか？", "a": [{"t": "純粋理性批判", "r": "感性と悟性の形式を明らかにし、形而上学を科学的な認識論へと再構築しようとした批判哲学の第一書です。"}, {"t": "実践理性批判", "r": "カントが道徳学や倫理、自由の法則について論じた第二の批判書です。"}, {"t": "判断力批判", "r": "美学や目的論について論じた第三の批判書です。"}, {"t": "精神現象学", "r": "ヘーゲルの主著であり、カントの認識論とは体系が異なります。"}], "hint": "「三批判書」のうち、認識論を扱った最初に出版されたものです。", "src": "Gemini Part 11"}, {"id": "g11-10", "cat": "科学", "q": "宇宙の進化において、宇宙は常に一定の状態を保っており、膨張に合わせて新しい物質が創造されているとする説（現在は否定されている）は何ですか？", "a": [{"t": "定常宇宙論", "r": "フレッド・ホイルらが提唱した説で、宇宙に始まりや終わりがないとするモデルですが、ビッグバン説により否定されました。"}, {"t": "ビッグバン理論", "r": "宇宙が一点から爆発的に始まったとする、現代の主流な宇宙モデルです。"}, {"t": "インフレーション理論", "r": "ビッグバンの直前に宇宙が急激な加速膨張を遂げたとする説です。"}, {"t": "サイクリック宇宙論", "r": "宇宙が膨張と収縮を繰り返すというモデルです。"}], "hint": "「常に変わらない」という意味の言葉が含まれています。", "src": "Gemini Part 11"}, {"id": "g11-11", "cat": "経済・社会", "q": "1944年に合意され、米ドルを基軸通貨とする固定為替相場制を確立した、戦後の国際金融体制を何といいますか？", "a": [{"t": "ブレトン・ウッズ体制", "r": "IMFや世界銀行の設立も決定した、金とドルを核とする国際通貨制度の枠組みです。"}, {"t": "スミソニアン体制", "r": "1971年に固定相場制を修正して維持しようとした短期的な体制です。"}, {"t": "プラザ合意", "r": "1985年にドル高是正のために主要5カ国が合意したものであり、戦後の体制そのものではありません。"}, {"t": "キングストン合意", "r": "1976年に変動為替相場制への移行を公式に承認した合意です。"}], "hint": "アメリカのニューハンプシャー州にある開催地の名称が冠されています。", "src": "Gemini Part 11"}, {"id": "g11-12", "cat": "哲学・宗教", "q": "仏教において、あらゆる物事は相互に関連し合って成立しており、独立して存在する実体はないとする根本的な考え方を何といいますか？", "a": [{"t": "縁起", "r": "「これがあるからこれがある」という相互依存の関係性を指し、空（くう）の思想の基礎ともなる真理です。"}, {"t": "解脱", "r": "煩悩の束縛から脱し、悟りの境地に達することを指します。"}, {"t": "輪廻", "r": "生と死を繰り返す迷いの世界のサイクルを指します。"}, {"t": "慈悲", "r": "他者の苦しみを除き、楽しみを与えるという倫理的な態度を指します。"}], "hint": "「縁（えん）によって起こる」という意味です。", "src": "Gemini Part 11"}, {"id": "g11-13", "cat": "文学", "q": "19世紀末、フランスでアルフレッド・ドレフュス大尉が冤罪で投獄された事件に際し、『私は告発する』という公開書簡で軍部を非難した作家は？", "a": [{"t": "エミール・ゾラ", "r": "自然主義文学の巨匠であり、真実のために命がけで国家権力に抗議を行い世論を二分させました。"}, {"t": "ヴィクトル・ユゴー", "r": "ロマン派の大家ですが、ドレフュス事件当時はすでに物故していました。"}, {"t": "ギュスターヴ・フローベール", "r": "『ボヴァリー夫人』の著者ですが、この事件での政治的抗議はゾラによるものが最も有名です。"}, {"t": "アルベール・カミュ", "r": "20世紀の作家であり、19世紀末のこの事件とは時代が重なりません。"}], "hint": "『居酒屋』や『ナナ』などの作品で社会の暗部を描いた自然主義の作家です。", "src": "Gemini Part 11"}, {"id": "g11-14", "cat": "生物・医学", "q": "生物学において、細胞内のミトコンドリアや葉緑体は、元々別の単細胞生物が細胞内に入り込み共生したことで誕生したとする説を何といいますか？", "a": [{"t": "細胞内共生説", "r": "リン・マーギュリスが提唱した説で、独自のDNAを持つことなどが有力な証拠とされています。"}, {"t": "自然発生説", "r": "生物が無生物から湧き出すとする説であり、パスツールらによって否定されました。"}, {"t": "獲得形質の遺伝説", "r": "ラマルクが提唱した、後天的に得た特徴が遺伝するという誤った進化論の説です。"}, {"t": "パンスペルミア説", "r": "生命の起源は地球外から飛来した微生物にあるとする説です。"}], "hint": "ミトコンドリアが核とは別の独自のゲノムを持つ理由を説明する理論です。", "src": "Gemini Part 11"}, {"id": "g11-15", "cat": "科学", "q": "地質時代において、恐竜が絶滅した後の約6600万年前から現在までを指す、最新の「代」の名前は何ですか？", "a": [{"t": "新生代", "r": "哺乳類や鳥類が適応放散し、人類が誕生した現代を含む地球史上の区分です。"}, {"t": "中生代", "r": "恐竜やアンモナイトが繁栄した時代です。"}, {"t": "古生代", "r": "魚類や両生類が現れた時代です。"}, {"t": "先カンブリア時代", "r": "生命の進化の初期段階を含む、地球誕生から古生代までの広大な期間です。"}], "hint": "「第四紀」や「古第三紀」などを含む、最も新しい時代区分です。", "src": "Gemini Part 11"}, {"id": "g11-16", "cat": "芸術・音楽", "q": "バロック時代の画家フェルメールが、投影によって正確な写実を行うために用いたとされる光学装置を何といいますか？", "a": [{"t": "カメラ・オブスクラ", "r": "暗箱に小さな穴を開け外の景色を投影する装置で、透視図法の補助として使われました。"}, {"t": "ダゲレオタイプ", "r": "19世紀に発明された世界初の写真技法そのものであり、フェルメールの時代には存在しません。"}, {"t": "マジック・ランタン", "r": "画像を拡大して投影するための初期のプロジェクターです。"}, {"t": "ステレオスコープ", "r": "2枚の画像を立体的に見せるための装置です。"}], "hint": "ラテン語で「暗い部屋」という意味を持つ装置です。", "src": "Gemini Part 11"}, {"id": "g11-17", "cat": "生物・医学", "q": "17世紀の医師ウィリアム・ハーベーが、当時の定説を覆して理論的に解明した、生理学上の重要な発見は何ですか？", "a": [{"t": "血液循環の原理", "r": "心臓がポンプとして機能し、血液が体内を巡っていることを定量的な実験で証明しました。"}, {"t": "ワクチンの原理", "r": "18世紀末のジェンナーによる発見です。"}, {"t": "ABO式血液型", "r": "20世紀初頭のラントシュタイナーによる発見です。"}, {"t": "酸素呼吸のメカニズム", "r": "呼吸と燃焼の関係は後のラヴォアジエらによって解明されました。"}], "hint": "心臓が「収縮」によって血液を送り出していることを指摘しました。", "src": "Gemini Part 11"}, {"id": "g11-18", "cat": "経済・社会", "q": "経済学において、失業率が低下すると物価の上昇率が高まるという、両者のトレードオフ関係を示した曲線を何といいますか？", "a": [{"t": "フィリップス曲線", "r": "失業率とインフレ率の負の相関関係を示した、マクロ経済学の重要なグラフです。"}, {"t": "ローレンツ曲線", "r": "所得の不平等度（格差）を視覚的に示す曲線です。"}, {"t": "ラッファー曲線", "r": "税率と税収の関係を示した曲線です。"}, {"t": "エンゲル曲線", "r": "所得の変化に伴う特定の財の需要量の変化を示す曲線です。"}], "hint": "「失業」と「インフレ」を天秤にかける際の基準となる曲線です。", "src": "Gemini Part 11"}, {"id": "g11-19", "cat": "日本史", "q": "日本の古代史において、752年の東大寺大仏「開眼供養」で導師を務めた、インド出身の僧侶は誰ですか？", "a": [{"t": "菩提僊那（ぼだいせんな）", "r": "聖武天皇の招きで来日し、日本の華厳宗の発展に寄与した「バラモン僧正」として知られます。"}, {"t": "鑑真", "r": "唐から渡日した高僧ですが、開眼供養の当時はまだ日本に到着していませんでした。"}, {"t": "行基", "r": "大仏建立の勧進に尽力しましたが、供養の直前に遷化（死去）しました。"}, {"t": "空海", "r": "平安時代の僧であり、奈良時代の大仏供養とは時代が異なります。"}], "hint": "「バラモン僧正」とも呼ばれる、天竺（インド）出身の僧侶です。", "src": "Gemini Part 11"}, {"id": "g11-20", "cat": "科学", "q": "物理学において、熱機関が供給された熱を 100% 仕事に変換することは不可能であるとする熱学上の基礎法則は何ですか？", "a": [{"t": "熱力学第二法則", "r": "エントロピー増大の法則とも呼ばれ、自然界のプロセスには不可逆的な方向性があることを示しています。"}, {"t": "熱力学第一法則", "r": "エネルギー保存の法則を熱現象に適用したものです。"}, {"t": "熱力学第三法則", "r": "絶対零度におけるエントロピーの状態に関する法則です。"}, {"t": "熱力学第零法則", "r": "熱平衡と温度の定義に関する法則です。"}], "hint": "「時間の矢」や「エントロピー」に関わる法則です。", "src": "Gemini Part 11"}, {"id": "g11-21", "cat": "地理", "q": "中米のパナマ運河において、水位の異なる海や湖を船が移動するために、複数の水門で水位を調節する仕組みを何といいますか？", "a": [{"t": "閘門（こうもん）式", "r": "船を水のエレベーターのように上下させるシステムで、パナマ地峡を横断するために不可欠な方式です。"}, {"t": "水平式", "r": "スエズ運河のように水位調節を必要としない方式ですが、パナマの地形では不可能です。"}, {"t": "ポンプ式", "r": "排水の仕組みを指す言葉であり、運河の航行方式を指す一般的な名称ではありません。"}, {"t": "インクライン式", "r": "傾斜鉄道を利用して船を運ぶ方式ですが、パナマ運河の主要な仕組みではありません。"}], "hint": "「ロック（Lock）」と呼ばれる装置を用いる方式です。", "src": "Gemini Part 11"}, {"id": "g11-22", "cat": "日本史", "q": "明治初期、岩倉使節団に同行した最年少の女子留学生で、後に女子英学塾（現・津田塾大学）を創設した人物は？", "a": [{"t": "津田梅子", "r": "当時6歳で渡米し、日本の女子高等教育の先駆者となりました。新五千円札の肖像でもあります。"}, {"t": "山川捨松", "r": "同行した女子留学生の一人ですが、津田梅子よりも年長でした。"}, {"t": "樋口一葉", "r": "明治の小説家ですが、岩倉使節団の留学生ではありません。"}, {"t": "平塚らいてう", "r": "大正・昭和の女性解放運動家です。"}], "hint": "2024年に発行された新しい五千円札の肖像に選ばれた人物です。", "src": "Gemini Part 11"}, {"id": "g11-23", "cat": "科学", "q": "化学において、同一の分子式を持ちながら原子の結合順序や空間配置が異なるために、性質が違う物質を何といいますか？", "a": [{"t": "異性体", "r": "構造異性体や幾何異性体などがあり、化学の多様性を生み出す要因となります。"}, {"t": "同素体", "r": "同一元素の単体で性質が異なるもの（ダイヤモンドと黒鉛など）です。"}, {"t": "同位体", "r": "原子番号は同じだが中性子の数が異なる（質量が違う）原子のことです。"}, {"t": "同族体", "r": "周期表において同じ縦の列に並ぶ元素の仲間のことです。"}], "hint": "「異なる性質を持つが、同じ体（分子式）を持つ」という意味の漢字を使います。", "src": "Gemini Part 11"}, {"id": "g11-24", "cat": "言葉・語源", "q": "故事成語「臥薪嘗胆」において、屈辱を忘れないために「なめる」対象となっているものは何ですか？", "a": [{"t": "苦い熊の胆（きも）", "r": "越王勾践が屈辱を忘れないために苦い胆をなめ、薪（たきぎ）の上で寝た故事に由来します。"}, {"t": "辛い塩", "r": "この故事において、なめる対象として記述されているものではありません。"}, {"t": "毒入りの酒", "r": "復讐の誓いとは異なります。"}, {"t": "冷たい水", "r": "苦労を表す言葉ですが、この故事の直接の「なめる」対象ではありません。"}], "hint": "「胆（たん）」という漢字そのものが大きなヒントです。", "src": "Gemini Part 11"}, {"id": "g11-25", "cat": "世界史", "q": "18世紀後半、蒸気機関の性能を飛躍的に向上させ、後の産業革命を加速させたイギリスの発明家は誰ですか？", "a": [{"t": "ジェームズ・ワット", "r": "分離凝縮器を発明して効率を劇的に高め、工業用の動力源として実用化に成功しました。"}, {"t": "スチーブンソン", "r": "蒸気機関車を実用化させた「鉄道の父」ですが、機関自体の改良者としてはワットの後発です。"}, {"t": "リチャード・アークライト", "r": "水力紡績機を発明した実業家であり、蒸気機関の改良者ではありません。"}, {"t": "ニューコメン", "r": "ワット以前に大気圧機関を発明した人物ですが、ワットほどの高効率は実現できませんでした。"}], "hint": "電力の単位にその名前が残っています。", "src": "Gemini Part 11"}, {"id": "g11-26", "cat": "地理", "q": "北欧五国の国旗に共通して見られる、中心を左側にずらした十字のデザイン様式を何といいますか？", "a": [{"t": "スカンジナビア十字（ノルディック・クロス）", "r": "デンマーク国旗を起源とし、北欧諸国の連帯とキリスト教への信仰を象徴するデザインです。"}, {"t": "セント・ジョージ・クロス", "r": "イングランド国旗などに使われる、中心にある正十字です。"}, {"t": "ケルティック・クロス", "r": "十字に円が重なったアイルランドなどの伝統的な十字です。"}, {"t": "サルトワール", "r": "スコットランドなどの「X」字型の十字デザインです。"}], "hint": "「北欧」の地域名が冠された名称です。", "src": "Gemini Part 11"}, {"id": "g11-27", "cat": "科学", "q": "コロイド溶液において、強い光を当てると光の通り道が輝いて見える現象を何といいますか？", "a": [{"t": "チンダル現象", "r": "コロイド粒子が光を散乱させるために起こる現象で、朝の霧に差し込む光などでも見られます。"}, {"t": "ブラウン運動", "r": "コロイド粒子が不規則に熱運動する溶媒分子に衝突して不規則に動く現象です。"}, {"t": "透析", "r": "半透膜を用いてコロイドと小さな不純物を分離する操作のことです。"}, {"t": "電気泳動", "r": "帯電した粒子が電界をかけた際に特定の電極へ移動する現象です。"}], "hint": "懐中電灯を霧の中でつけたときの光の筋をイメージしてください。", "src": "Gemini Part 11"}, {"id": "g11-28", "cat": "芸術・音楽", "q": "ルネサンス期にレオナルド・ダ・ヴィンチが確立した、輪郭をぼかすことで空気感や立体感を表現する技法を何といいますか？", "a": [{"t": "スフマート", "r": "イタリア語で「煙のような」という意味で、『モナ・リザ』の口元などの表現に典型的です。"}, {"t": "テネブリズム", "r": "強烈な明暗対比による劇的な表現技法であり、カラヴァッジョらが用いました。"}, {"t": "インパスト", "r": "絵具を厚く塗り重ねて質感を出す技法です。"}, {"t": "遠近法", "r": "空間の奥行きを数学的に構成する手法の総称です。"}], "hint": "「煙のような」を意味する言葉に由来する、レオナルド独自のぼかし技法です。", "src": "Gemini Part 11"}, {"id": "g11-30", "cat": "経済・社会", "q": "国連の主要機関の一つで、世界の平和と安全に責任を負い、5カ国の常任理事国が拒否権を持つ機関は何ですか？", "a": [{"t": "安全保障理事会", "r": "武力制裁を含む拘束力のある決定を下すことができる、国連で最も強力な権限を持つ機関です。"}, {"t": "総会", "r": "全加盟国が参加する審議機関ですが、安保理のような強制力はありません。"}, {"t": "経済社会理事会", "r": "経済や社会、環境問題などの調整を行う機関です。"}, {"t": "事務局", "r": "国連の日常業務を執行する行政機関です。"}], "hint": "ニューヨークの本部にあり、5つの常任理事国（P5）が中心となります。", "src": "Gemini Part 11"}, {"id": "g12-01", "cat": "世界史", "q": "843年に結ばれ、フランク王国を東・中・西の3つに分割し、現在のドイツ・イタリア・フランスの国境の原型を作った条約は何ですか？", "a": [{"t": "ヴェルダン条約", "r": "カール大帝の孫たちの間で領土が分割され、西欧の歴史的な国境の基礎が築かれました。"}, {"t": "メルセン条約", "r": "ヴェルダン条約の後に中部フランク王国を再分割した条約です。"}, {"t": "ウェストファリア条約", "r": "17世紀の三十年戦争の講和条約です。"}, {"t": "トルデシリャス条約", "r": "15世紀にスペインとポルトガルが結んだ条約です。"}], "hint": "この条約により、ヨーロッパの主要3カ国の枠組みが生まれました。", "src": "Gemini Part 12"}, {"id": "g12-02", "cat": "科学", "q": "物理学の熱力学において、理論上考えうる最高の熱効率を持つ理想的な熱機関のサイクルを、提唱したフランスの物理学者の名から何といいますか？", "a": [{"t": "カルノー・サイクル", "r": "ニコラ・レオナール・サディ・カルノーが提唱し、熱力学第二法則の基礎となる重要な概念です。"}, {"t": "オットー・サイクル", "r": "ガソリンエンジンなどの火花点火機関の理想サイクルです。"}, {"t": "ディーゼル・サイクル", "r": "ディーゼルエンジンの理想サイクルです。"}, {"t": "ランキン・サイクル", "r": "蒸気タービンなどの理想サイクルです。"}], "hint": "どのような熱機関も、このサイクル以上の熱効率を出すことはできないと証明されました。", "src": "Gemini Part 12"}, {"id": "g12-03", "cat": "文学", "q": "トーマス・マンの代表作で、結核療養所（サナトリウム）を舞台に青年ハンス・カストルプの精神的成長と第一次世界大戦前のヨーロッパの思想的対立を描いた長編小説は？", "a": [{"t": "魔の山", "r": "スイスのダボスにあるサナトリウムを舞台にした、20世紀ドイツ文学の最高峰の一つです。"}, {"t": "車輪の下", "r": "ヘルマン・ヘッセによる、優等生の少年の挫折を描いた小説です。"}, {"t": "失われた時を求めて", "r": "マルセル・プルーストの長編小説です。"}, {"t": "百年の孤独", "r": "ガブリエル・ガルシア＝マルケスの長編小説です。"}], "hint": "外界から隔離された、雪深い高地の療養所が舞台です。", "src": "Gemini Part 12"}, {"id": "g12-04", "cat": "経済・社会", "q": "経済学において、価格が上昇するとかえって需要が増加する特殊な下級財のことを、提唱したイギリスの経済学者の名から「何財」といいますか？", "a": [{"t": "ギッフェン財", "r": "所得効果が代替効果を上回る劣等財で、アイルランドのジャガイモ飢饉時の現象を説明する際に用いられました。"}, {"t": "ヴェブレン財", "r": "顕示欲（見栄）を満たすために、価格が高いほど需要が増える高級品などを指します。"}, {"t": "公共財", "r": "非排除性と非競合性を持つ、警察や国防などのサービスを指します。"}, {"t": "補完財", "r": "パンとバターのように、互いに組み合わせて消費される財のことです。"}], "hint": "価格が上がると、他の食品を買う余裕がなくなり、仕方なくその食品ばかりを買うようになる現象です。", "src": "Gemini Part 12"}, {"id": "g12-05", "cat": "芸術・音楽", "q": "マーラーの交響曲第1番につけられた、ジャン・パウルの同名の小説に由来する標題（タイトル）は何ですか？", "a": [{"t": "巨人", "r": "マーラーの初期の代表作であり、若々しいエネルギーと苦悩が表現されています。"}, {"t": "復活", "r": "マーラーの交響曲第2番の標題です。"}, {"t": "悲劇的", "r": "マーラーの交響曲第6番の標題です。"}, {"t": "千人の交響曲", "r": "マーラーの交響曲第8番の通称です。"}], "hint": "ギリシャ神話のティーターンに相当する言葉です。", "src": "Gemini Part 12"}, {"id": "g12-06", "cat": "生物・医学", "q": "生物学において、細胞呼吸の中でピルビン酸がミトコンドリア内で分解され、NADHやFADH2を生み出す一連の化学反応系を何といいますか？", "a": [{"t": "クエン酸回路", "r": "発見者の名を取って「クレブス回路」や、TCA回路とも呼ばれ、エネルギー通貨ATPを生み出すための重要な過程です。"}, {"t": "カルビン・ベンソン回路", "r": "光合成において二酸化炭素を固定し、糖を合成する回路です。"}, {"t": "解糖系", "r": "細胞質基質で行われる、グルコースをピルビン酸に分解する初期の過程です。"}, {"t": "電子伝達系", "r": "クエン酸回路で作られたNADHなどを利用して、大量のATPを合成する最終段階です。"}], "hint": "「TCA回路」や「クレブス回路」とも呼ばれます。", "src": "Gemini Part 12"}, {"id": "g12-07", "cat": "地理", "q": "ニュージーランドの北島と南島を隔てる海峡を、この地を探検したイギリスの航海者の名から何海峡といいますか？", "a": [{"t": "クック海峡", "r": "ジェームズ・クックが1770年にこの海峡を通過し、ニュージーランドが二つの大きな島であることを確認しました。"}, {"t": "マゼラン海峡", "r": "南アメリカ大陸南端の海峡です。"}, {"t": "ドーバー海峡", "r": "イギリスとフランスの間にある海峡です。"}, {"t": "ベーリング海峡", "r": "ユーラシア大陸と北アメリカ大陸の間にある海峡です。"}], "hint": "オーストラリア東海岸（ニューサウスウェールズ）を探検したのと同じ人物の名前です。", "src": "Gemini Part 12"}, {"id": "g12-08", "cat": "哲学・宗教", "q": "著書『リヴァイアサン』の中で、自然状態を「万人の万人に対する闘争」と表現し、強力な国家権力（主権者）の必要性を説いたイギリスの哲学者は誰ですか？", "a": [{"t": "トマス・ホッブズ", "r": "人間の利己的な本性を前提とし、平和を維持するために絶対的な権力へ権利を譲渡する社会契約説を唱えました。"}, {"t": "ジョン・ロック", "r": "『統治二論』で抵抗権を含む民主主義的な社会契約説を説いた哲学者です。"}, {"t": "ジャン＝ジャック・ルソー", "r": "『社会契約論』で人民主権を説いたフランスの思想家です。"}, {"t": "モンテスキュー", "r": "『法の精神』で三権分立を説いたフランスの思想家です。"}], "hint": "旧約聖書に登場する巨大な怪物に国家をなぞらえました。", "src": "Gemini Part 12"}, {"id": "g12-09", "cat": "科学", "q": "量子力学において、1つの原子軌道には最大で2つの電子しか入ることができず、かつそれらのスピンは逆向きでなければならないとする原理を何といいますか？", "a": [{"t": "パウリの排他原理", "r": "ヴォルフガング・パウリが提唱し、物質が安定した体積を持つことや周期表の構造を説明する基本的な原理です。"}, {"t": "ハイゼンベルクの不確定性原理", "r": "粒子の位置と運動量を同時に正確に測定することは不可能であるという原理です。"}, {"t": "フントの規則", "r": "電子が軌道に入る際、可能な限り不対電子が多くなるように配置されるという規則です。"}, {"t": "アウフバウ原理", "r": "電子はエネルギー準位の低い軌道から順に配置されるという原理です。"}], "hint": "「複数のフェルミ粒子が同じ量子状態を占めることはできない」という原理です。", "src": "Gemini Part 12"}, {"id": "g12-10", "cat": "科学", "q": "1949年、原子核の内部で陽子や中性子を結びつける「中間子」の存在を予言した功績により、日本人として初めてノーベル賞（物理学賞）を受賞した科学者は誰ですか？", "a": [{"t": "湯川秀樹", "r": "戦後の日本に大きな希望を与えた、日本初のノーベル賞受賞者です。"}, {"t": "朝永振一郎", "r": "1965年に日本人で2人目のノーベル物理学賞を受賞しました。"}, {"t": "福井謙一", "r": "フロンティア軌道理論で日本人初のノーベル化学賞を受賞しました。"}, {"t": "利根川進", "r": "抗体の多様性の遺伝的原理の解明で日本人初のノーベル生理学・医学賞を受賞しました。"}], "hint": "彼の名を冠した研究所が京都大学にあります。", "src": "Gemini Part 12"}, {"id": "g12-11", "cat": "文学", "q": "鎌倉時代初期に後鳥羽上皇の命で編纂され、藤原定家や西行らの技巧的で象徴的な歌が多く収められた、第八番目の勅撰和歌集は何ですか？", "a": [{"t": "新古今和歌集", "r": "本歌取りなどの技巧を駆使し、幽玄・有心の美学を追求した中世和歌の頂点です。"}, {"t": "古今和歌集", "r": "平安時代前期に紀貫之らが編纂した、最初の勅撰和歌集です。"}, {"t": "万葉集", "r": "奈良時代末期に成立した、日本最古の和歌集ですが、勅撰ではありません。"}, {"t": "金槐和歌集", "r": "鎌倉幕府第3代将軍・源実朝の私家集です。"}], "hint": "「八代集」の最後に位置する和歌集です。", "src": "Gemini Part 12"}, {"id": "g12-12", "cat": "芸術・音楽", "q": "ノートルダム大聖堂などに代表される、尖頭アーチや飛び梁（フライング・バットレス）、巨大なステンドグラスを特徴とする中世ヨーロッパの建築様式は何ですか？", "a": [{"t": "ゴシック建築", "r": "壁を薄くし窓を大きく取ることで、内部に豊かな光を取り入れることを可能にした12世紀以降の建築様式です。"}, {"t": "ロマネスク建築", "r": "ゴシック以前の様式で、厚い壁と小さな窓、半円アーチが特徴です。"}, {"t": "ビザンティン建築", "r": "東ローマ帝国で発達し、巨大なドームとモザイク装飾が特徴です（例：アヤ・ソフィア）。"}, {"t": "バロック建築", "r": "17世紀の、過剰な装飾と劇的な空間構成を特徴とする様式です。"}], "hint": "「ゴート風の」という意味から名付けられました。", "src": "Gemini Part 12"}, {"id": "g12-13", "cat": "文学", "q": "ギリシャ神話で、父親が作った蝋（ろう）の翼で空を飛んで迷宮から脱出したものの、忠告を無視して太陽に近づきすぎ、海に墜落して死んでしまった青年は誰ですか？", "a": [{"t": "イカロス", "r": "人間の傲慢さやテクノロジーの限界への警句として、西洋文学や芸術でたびたび題材とされます。"}, {"t": "アキレウス", "r": "トロイア戦争の英雄で、かかと（アキレス腱）のみが弱点でした。"}, {"t": "ヘラクレス", "r": "12の功業を成し遂げた、ギリシャ神話最大の英雄です。"}, {"t": "ペルセウス", "r": "メドゥーサを退治した英雄です。"}], "hint": "彼の父ダイダロスは、クレタ島にミノタウロスの迷宮を建設した名工です。", "src": "Gemini Part 12"}, {"id": "g12-14", "cat": "科学", "q": "太陽系で2番目に大きな衛星であり、土星の衛星の中では最大、そして太陽系で唯一、濃い大気を持つことで知られる天体は何ですか？", "a": [{"t": "タイタン", "r": "窒素を主成分とする分厚い大気を持ち、地表には液体メタンの湖が存在することが確認されています。"}, {"t": "ガニメデ", "r": "木星の衛星で、太陽系最大の衛星ですが、濃い大気はありません。"}, {"t": "エウロパ", "r": "木星の衛星で、氷の地殻の下に液体の海が存在すると考えられています。"}, {"t": "イオ", "r": "木星の衛星で、太陽系で最も活発な火山活動を行っています。"}], "hint": "ホイヘンス・プローブという探査機が着陸に成功しました。", "src": "Gemini Part 12"}, {"id": "g12-15", "cat": "経済・社会", "q": "国連の機関の一つで、紛争や迫害によって故郷を追われた人々を保護・支援する「国連難民高等弁務官事務所」のアルファベット略称は何ですか？", "a": [{"t": "UNHCR", "r": "United Nations High Commissioner for Refugeesの略で、二度のノーベル平和賞を受賞しています。"}, {"t": "UNICEF", "r": "国連児童基金の略称で、子どもたちの支援を行います。"}, {"t": "UNESCO", "r": "国連教育科学文化機関の略称で、世界遺産の登録などを行います。"}, {"t": "WHO", "r": "世界保健機関の略称です。"}], "hint": "かつて日本人の緒方貞子氏がトップ（高等弁務官）を務めました。", "src": "Gemini Part 12"}, {"id": "g12-16", "cat": "経済・社会", "q": "経済学において、税率を極端に高くすると労働意欲や投資が阻害され、結果的に政府の税収が減少するという関係を、逆U字型のグラフで示した曲線を何といいますか？", "a": [{"t": "ラッファー曲線", "r": "アメリカの経済学者アーサー・ラッファーが提唱し、サプライサイド経済学や減税政策の理論的根拠となりました。"}, {"t": "フィリップス曲線", "r": "失業率とインフレ率のトレードオフ関係を示す曲線です。"}, {"t": "ローレンツ曲線", "r": "所得の不平等の度合いを示す曲線です。"}, {"t": "エンゲル曲線", "r": "所得と特定の財への支出額の関係を示す曲線です。"}], "hint": "1980年代のレーガノミクス（アメリカの経済政策）に影響を与えました。", "src": "Gemini Part 12"}, {"id": "g12-17", "cat": "科学", "q": "地球科学において、鉱物の硬さを引っかき傷に対する抵抗力として、1（滑石）から10（ダイヤモンド）までの10段階の標準物質で表した指標を何といいますか？", "a": [{"t": "モース硬度", "r": "ドイツの鉱物学者フリードリッヒ・モースが考案した、野外調査などで簡便に硬さを比較できる指標です。"}, {"t": "ビッカース硬度", "r": "ダイヤモンドの圧子を押し付けて測定する、工業材料向けの硬度指標です。"}, {"t": "ロックウェル硬度", "r": "くぼみの深さから硬さを測定する工業的な指標です。"}, {"t": "ブリネル硬度", "r": "鋼球を押し付けて測定する硬度指標です。"}], "hint": "蛍石、石英、トパーズなどが基準の鉱物として使われています。", "src": "Gemini Part 12"}, {"id": "g12-18", "cat": "世界史", "q": "1815年、エルバ島から脱出して復権したナポレオンが、ウェリントン公率いるイギリス・オランダ連合軍などに決定的な敗北を喫し、百日天下を終わらせた戦いは何ですか？", "a": [{"t": "ワーテルローの戦い", "r": "現在のベルギーで行われたこの戦いでナポレオンは完全に敗れ、セントヘレナ島へ流刑となりました。"}, {"t": "トラファルガーの海戦", "r": "1805年にイギリスのネルソン提督がフランス・スペイン連合艦隊を破った海戦です。"}, {"t": "ワーグラムの戦い", "r": "1809年にナポレオンがオーストリア軍を破った戦いです。"}, {"t": "アウステルリッツの戦い", "r": "1805年、ナポレオンがロシア・オーストリア連合軍を破った「三帝会戦」です。"}], "hint": "「彼の〇〇〇〇（敗北の意味）」という英語の慣用句にもなっています。", "src": "Gemini Part 12"}, {"id": "g12-19", "cat": "芸術・音楽", "q": "クラシック音楽において、ピアノやヴァイオリンなどの「独奏楽器」と「オーケストラ（管弦楽）」が掛け合いながら演奏される楽曲形式を、イタリア語で何といいますか？", "a": [{"t": "コンチェルト（協奏曲）", "r": "ソリストの技巧の華やかさと、オーケストラの豊かな響きが対比される楽曲形式です。"}, {"t": "ソナタ（奏鳴曲）", "r": "独奏楽器または少数楽器のための器楽曲です。"}, {"t": "シンフォニー（交響曲）", "r": "オーケストラ全体で演奏される多楽章の楽曲です。"}, {"t": "カデンツァ", "r": "協奏曲などの終盤で、独奏者がオーケストラの伴奏なしに自由に技巧を披露する部分のことです。"}], "hint": "チャイコフスキーやラフマニノフの作品が有名です。日本語では「協奏曲」と訳されます。", "src": "Gemini Part 12"}, {"id": "g12-20", "cat": "文学", "q": "小説『ライ麦畑でつかまえて（キャッチャー・イン・ザ・ライ）』において、社会の欺瞞に反発する主人公ホールデン・コールフィールドの孤独を描いたアメリカの作家は誰ですか？", "a": [{"t": "J.D.サリンジャー", "r": "青春の焦燥と純粋さを見事に描き、世界中の若者に多大な影響を与えた後、表舞台から姿を消しました。"}, {"t": "F.スコット・フィッツジェラルド", "r": "『グレート・ギャツビー』などで知られる「失われた世代」の作家です。"}, {"t": "アーネスト・ヘミングウェイ", "r": "『老人と海』『武器よさらば』などで知られるアメリカの作家です。"}, {"t": "ジョン・スタインベック", "r": "『怒りの葡萄』『エデンの東』などで知られる作家です。"}], "hint": "『ナイン・ストーリーズ』などの短編集でも知られます。", "src": "Gemini Part 12"}, {"id": "g12-21", "cat": "生物・医学", "q": "生物学において、DNA（デオキシリボ核酸）の二重らせん構造の中で、塩基の「シトシン（C）」と常にペアを組んで水素結合を形成する塩基は何ですか？", "a": [{"t": "グアニン（G）", "r": "DNAにおいて、シトシンはグアニンと3本の水素結合を形成し、アデニンはチミンと2本の水素結合を形成します。"}, {"t": "チミン（T）", "r": "DNAにおいて、アデニン（A）とペアを組む塩基です。"}, {"t": "アデニン（A）", "r": "チミン、またはRNAの場合はウラシルとペアを組む塩基です。"}, {"t": "ウラシル（U）", "r": "RNAにおいて、チミンの代わりにアデニンとペアを組む塩基です。"}], "hint": "頭文字「G」で表される塩基です。", "src": "Gemini Part 12"}, {"id": "g12-22", "cat": "哲学・宗教", "q": "著書『方法序説』において、あらゆるものを疑い尽くした末に確実に存在する自己を見いだし、「我思う、ゆえに我あり」という命題を確立したフランスの哲学者は？", "a": [{"t": "デカルト", "r": "方法的懐疑によって確実な真理を求め、近代哲学の父と呼ばれました。解析幾何学の創始者でもあります。"}, {"t": "カント", "r": "『純粋理性批判』などを著したドイツの哲学者です。"}, {"t": "スピノザ", "r": "神と自然は同一であるとする「汎神論」を説いたオランダの哲学者です。"}, {"t": "パスカル", "r": "「人間は考える葦である」という言葉を残した同時代のフランスの思想家です。"}], "hint": "ラテン語で「コギト・エルゴ・スム」という言葉です。直交座標系にも名前が残っています。", "src": "Gemini Part 12"}, {"id": "g12-23", "cat": "地理", "q": "南半球に位置するニュージーランドの首都であり、北島の南端に位置する「世界で最も南にある首都」はどこですか？", "a": [{"t": "ウェリントン", "r": "ニュージーランドの政治の中心地であり、強風が吹くことから「ウィンディ・ウェリントン」とも呼ばれます。"}, {"t": "オークランド", "r": "ニュージーランド最大の都市で経済の中心ですが、首都ではありません。"}, {"t": "クライストチャーチ", "r": "南島にある最大の都市です。"}, {"t": "ハミルトン", "r": "北島の内陸にある主要都市です。"}], "hint": "イギリスの有名な将軍にちなんで名付けられました。", "src": "Gemini Part 12"}, {"id": "g12-24", "cat": "科学", "q": "ウラン鉱石の精製から「ポロニウム」と「ラジウム」という新しい放射性元素を発見し、ノーベル物理学賞と化学賞の2部門を受賞した科学者は誰ですか？", "a": [{"t": "マリ・キュリー（キュリー夫人）", "r": "放射能の研究に生涯を捧げ、女性初のノーベル賞受賞者であるとともに、異なる科学部門で二度受賞した唯一の人物です。"}, {"t": "リーゼ・マイトナー", "r": "核分裂の理論的解明を行いましたが、ノーベル賞は受賞できませんでした。"}, {"t": "ロザリンド・フランクリン", "r": "DNAのX線回折写真を撮影した化学者です。"}, {"t": "アダ・ラブレス", "r": "世界初のコンピュータープログラマーとされる人物です。"}], "hint": "ポーランド出身で、祖国の名にちなんでポロニウムと名付けました。", "src": "Gemini Part 12"}, {"id": "g12-25", "cat": "日本史", "q": "1868年、京都の南郊で旧幕府軍と新政府軍が衝突し、その後の戊辰戦争の口火を切ることとなった戦いを何といいますか？", "a": [{"t": "鳥羽・伏見の戦い", "r": "数の上では劣る新政府軍が、最新の兵器と「錦の御旗」の掲揚によって旧幕府軍を敗走させました。"}, {"t": "蛤御門の変（禁門の変）", "r": "1864年、長州藩が京都の御所周辺で会津藩・薩摩藩らと衝突した事件です。"}, {"t": "戊辰戦争", "r": "鳥羽・伏見の戦いから箱館戦争まで続く内戦全体の総称です。"}, {"t": "箱館戦争", "r": "1869年に終結した、戊辰戦争の最後の戦いです。"}], "hint": "京都の南にある地名が二つつながった名称です。", "src": "Gemini Part 12"}, {"id": "g12-26", "cat": "芸術・音楽", "q": "ルネサンス初期から盛期にかけてフィレンツェで活躍し、ギリシャ神話を題材とした『春（プリマヴェーラ）』や『ヴィーナスの誕生』などの傑作を残した画家は誰ですか？", "a": [{"t": "ボッティチェッリ", "r": "メディチ家の庇護を受け、優美な線描と寓意に富んだ作品でルネサンス美術を彩りました。"}, {"t": "レオナルド・ダ・ヴィンチ", "r": "ルネサンス盛期の巨匠で『モナ・リザ』などで知られますが、これらの作品の作者ではありません。"}, {"t": "ミケランジェロ", "r": "ルネサンス期の彫刻・画家で、『ダヴィデ像』やシスティーナ礼拝堂の壁画で知られます。"}, {"t": "ラファエロ", "r": "『アテナイの学堂』などで知られるルネサンス盛期の画家です。"}], "hint": "ウフィツィ美術館に彼の作品専用の大きな展示室があります。", "src": "Gemini Part 12"}, {"id": "g12-27", "cat": "科学", "q": "物理学において、すべての分子や原子の熱運動が理論上完全に停止する、これ以上下がることのない最低温度（セルシウス度で-273.15度）を何といいますか？", "a": [{"t": "絶対零度", "r": "熱力学温度（ケルビン）の0Kに相当し、物理学の極限状態を示す重要な基準です。"}, {"t": "臨界温度", "r": "気体をいくら圧縮しても液体にならなくなる境界の温度のことです。"}, {"t": "融点", "r": "固体が液体になり始める温度のことです。"}, {"t": "三重点", "r": "物質の固体・液体・気体の3つの状態が共存する温度と圧力の点です。"}], "hint": "ケルビン（K）という単位の起点となる温度です。", "src": "Gemini Part 12"}, {"id": "g12-28", "cat": "経済・社会", "q": "マクロ経済学において、ケインズ経済学（財政政策重視）を批判し、中央銀行による通貨供給量（マネーサプライ）のコントロールこそが物価や経済活動を決定すると主張した、ミルトン・フリードマンらの学派を何といいますか？", "a": [{"t": "マネタリズム", "r": "1970年代以降のスタグフレーションを背景に台頭し、自由市場を重視する新自由主義の経済政策に影響を与えました。"}, {"t": "重商主義", "r": "16〜18世紀にかけて、国家の富を貴金属の蓄積とみなし貿易統制を行った経済思想です。"}, {"t": "マルクス経済学", "r": "資本主義の搾取構造を批判し、社会主義への移行を説いた経済学派です。"}, {"t": "古典派経済学", "r": "アダム・スミスやリカードに始まり、市場の自動調整機能を重視した学派です。"}], "hint": "「通貨（マネー）」を重視する考え方です。", "src": "Gemini Part 12"}, {"id": "g12-29", "cat": "文学", "q": "「ゆく河の流れは絶えずして、しかももとの水にあらず」という、中世の無常観を見事に表現した書き出しで有名な、鴨長明による鎌倉時代の随筆は何ですか？", "a": [{"t": "方丈記", "r": "度重なる災害や戦乱を経験した長明が、隠遁生活の中で社会の無常を綴った日本三大随筆の一つです。"}, {"t": "徒然草", "r": "「つれづれなるままに…」で始まる、吉田兼好の随筆です。"}, {"t": "枕草子", "r": "「春はあけぼの…」で始まる、清少納言の平安時代の随筆です。"}, {"t": "歎異抄", "r": "親鸞の弟子・唯円が、親鸞の教えと異端の説について記した仏教書です。"}], "hint": "長明が住んでいた一丈四方の小さな庵（庵室）の名前がタイトルになっています。", "src": "Gemini Part 12"}, {"id": "g12-30", "cat": "世界史", "q": "古代ローマにおいて、紀元前60年にカエサル、ポンペイウス、クラッススの3人の実力者が、元老院に対抗して国政を私物化した政治体制を何といいますか？", "a": [{"t": "第1回三頭政治", "r": "非公式な同盟関係でしたが、強大な権力を持ちローマ共和政末期の混乱を主導しました。"}, {"t": "第2回三頭政治", "r": "カエサル暗殺後に、オクタウィアヌス、アントニウス、レピドゥスが結んだ公式な政治体制です。"}, {"t": "帝政ローマ", "r": "オクタウィアヌス（アウグストゥス）が権力を掌握した後に始まった体制です。"}, {"t": "テトラルキア（四分割統治）", "r": "3世紀末にディオクレティアヌス帝が導入した、ローマ帝国を4人で分割統治する体制です。"}], "hint": "3人のトップによる政治です。", "src": "Gemini Part 12"}, {"id": "c1-01", "cat": "日本史", "q": "1582年、京都の本能寺に宿泊していた織田信長を襲撃し、自害に追い込んだ武将は誰ですか？", "a": [{"t": "明智光秀", "r": "信長の重臣でしたが謀反を起こし、その後山崎の戦いで羽柴秀吉に敗れました。"}, {"t": "羽柴秀吉", "r": "本能寺の変の後、中国大返しで京に戻り光秀を討った人物です。"}, {"t": "柴田勝家", "r": "信長の筆頭家老で、変の翌年に賤ヶ岳の戦いで秀吉に敗れました。"}, {"t": "松永久秀", "r": "信長に背いて1577年に信貴山城で自害しており、本能寺の変の時には既に亡くなっていました。"}], "hint": "変の後、わずか十数日で山崎の戦いに敗れた武将です。", "src": "Claude 2026-10"}, {"id": "c1-02", "cat": "日本史", "q": "杉田玄白らとともに『ターヘル・アナトミア』を翻訳し『解体新書』を刊行した際、最もオランダ語に通じていた中心人物は誰ですか？", "a": [{"t": "前野良沢", "r": "翻訳作業の中心でしたが、訳の完成度に満足せず『解体新書』に名前を載せなかったとされます。"}, {"t": "平賀源内", "r": "エレキテルの復元などで知られる多才な人物ですが、翻訳の中心ではありません。"}, {"t": "大槻玄沢", "r": "杉田玄白・前野良沢の弟子で、後に『重訂解体新書』を著しました。"}, {"t": "緒方洪庵", "r": "幕末の蘭方医で適塾を開いた人物です。時代が後になります。"}], "hint": "豊前中津藩の藩医で、「蘭化」とも号しました。", "src": "Claude 2026-10"}, {"id": "c1-03", "cat": "日本史", "q": "1086年、皇位を譲った後も上皇として政治の実権を握り続ける「院政」を始めたのは誰ですか？", "a": [{"t": "白河上皇", "r": "堀河天皇に譲位した後、上皇として実権を握り院政の時代を開きました。"}, {"t": "後白河上皇", "r": "平安末期から鎌倉初期に院政を行い、源平の争乱期を生き抜いた人物です。"}, {"t": "鳥羽上皇", "r": "白河上皇の後を継いで院政を行いました。"}, {"t": "後鳥羽上皇", "r": "1221年の承久の乱で鎌倉幕府に敗れ、隠岐へ流されました。"}], "hint": "「賀茂川の水、双六の賽、山法師」を意のままにならないものとして挙げた逸話で知られます。", "src": "Claude 2026-10"}, {"id": "c1-04", "cat": "日本史", "q": "京都・東山に慈照寺（銀閣）を造営し、東山文化を育んだ室町幕府の将軍は誰ですか？", "a": [{"t": "足利義政", "r": "第8代将軍。政治的には応仁の乱を招きましたが、書院造や茶の湯など東山文化の担い手となりました。"}, {"t": "足利義満", "r": "第3代将軍で、北山に鹿苑寺（金閣）を建てました。"}, {"t": "足利義教", "r": "第6代将軍で、「くじ引き将軍」として知られ、嘉吉の乱で暗殺されました。"}, {"t": "足利尊氏", "r": "室町幕府の初代将軍です。"}], "hint": "応仁の乱の一因となった将軍継嗣問題の当事者です。", "src": "Claude 2026-10"}, {"id": "c1-05", "cat": "世界史", "q": "1453年、オスマン帝国のメフメト2世によって首都コンスタンティノープルを攻略され、滅亡した国はどこですか？", "a": [{"t": "東ローマ（ビザンツ）帝国", "r": "約千年続いた帝国で、陥落後コンスタンティノープルはイスタンブルとしてオスマン帝国の首都になりました。"}, {"t": "西ローマ帝国", "r": "476年に滅亡しています。"}, {"t": "神聖ローマ帝国", "r": "1806年にナポレオン戦争の中で解体されました。"}, {"t": "セルジューク朝", "r": "11〜12世紀のトルコ系王朝で、オスマン帝国以前に勢力を持ちました。"}], "hint": "ギリシア正教の中心地でもあった帝国です。", "src": "Claude 2026-10"}, {"id": "c1-06", "cat": "世界史", "q": "1215年、貴族たちに迫られて王権を制限する「マグナ・カルタ（大憲章）」を承認したイングランド王は誰ですか？", "a": [{"t": "ジョン王", "r": "フランス領の多くを失い重税を課したため貴族の反発を招き、大憲章を認めさせられました。"}, {"t": "リチャード1世", "r": "「獅子心王」と呼ばれ、第3回十字軍で活躍したジョン王の兄です。"}, {"t": "ヘンリー8世", "r": "16世紀の王で、イギリス国教会を成立させました。"}, {"t": "エドワード1世", "r": "13世紀後半に模範議会を招集した王です。"}], "hint": "「欠地王」というあだ名を持つ王です。", "src": "Claude 2026-10"}, {"id": "c1-07", "cat": "世界史", "q": "ロゼッタ・ストーンに刻まれたヒエログリフ（神聖文字）を解読したフランスの学者は誰ですか？", "a": [{"t": "シャンポリオン", "r": "1822年に解読を発表し、古代エジプト学の基礎を築きました。"}, {"t": "トマス・ヤング", "r": "イギリスの物理学者で解読に先鞭をつけましたが、体系的解読はシャンポリオンによるものです。"}, {"t": "ハワード・カーター", "r": "1922年にツタンカーメン王墓を発見した考古学者です。"}, {"t": "シュリーマン", "r": "トロイア遺跡を発掘したドイツの実業家・考古学者です。"}], "hint": "ナポレオンのエジプト遠征で発見された石碑が鍵となりました。", "src": "Claude 2026-10"}, {"id": "c1-08", "cat": "世界史", "q": "「目には目を、歯には歯を」の同害復讐の原則で知られるハンムラビ法典を制定した王国はどこですか？", "a": [{"t": "古バビロニア王国", "r": "前18世紀頃、ハンムラビ王がメソポタミアを統一し、この法典を定めました。"}, {"t": "アッシリア王国", "r": "前7世紀に初めてオリエントを統一した国です。"}, {"t": "ヒッタイト王国", "r": "鉄器をいち早く使用したことで知られる小アジアの国です。"}, {"t": "シュメール人の都市国家", "r": "より古いウル・ナンム法典などが知られますが、ハンムラビ法典ではありません。"}], "hint": "首都はユーフラテス川沿いの都市でした。", "src": "Claude 2026-10"}, {"id": "c1-09", "cat": "科学", "q": "元素記号「W」で表される元素は何ですか？", "a": [{"t": "タングステン", "r": "ドイツ語名ヴォルフラム（Wolfram）に由来し、金属中で最も融点が高い元素です。"}, {"t": "亜鉛", "r": "元素記号はZnです。"}, {"t": "ビスマス", "r": "元素記号はBiです。"}, {"t": "鉄", "r": "元素記号はFe（ラテン語ferrum）です。"}], "hint": "白熱電球のフィラメントに使われていた金属です。", "src": "Claude 2026-10"}, {"id": "c1-10", "cat": "科学", "q": "光は1秒間に約30万km進みます。これは地球の赤道を1秒間におよそ何周する速さですか？", "a": [{"t": "約7周半", "r": "地球の赤道の周囲は約4万kmなので、30万÷4万で約7.5周になります。"}, {"t": "約3周", "r": "計算が合いません。"}, {"t": "約12周", "r": "計算が合いません。"}, {"t": "約20周", "r": "計算が合いません。"}], "hint": "地球一周は約4万kmです。", "src": "Claude 2026-10"}, {"id": "c1-11", "cat": "科学", "q": "遠方の銀河ほど速い速度で遠ざかっている、すなわち後退速度が距離に比例するという、宇宙膨張の証拠となった法則を何といいますか？", "a": [{"t": "ハッブル＝ルメートルの法則", "r": "1929年にハッブルが観測から示し、それ以前にルメートルも理論的に導いていたことから、2018年に国際天文学連合がこの名称を推奨しました。"}, {"t": "ケプラーの法則", "r": "惑星の運動に関する3つの法則です。"}, {"t": "ティティウス・ボーデの法則", "r": "惑星の太陽からの距離に関する経験則です。"}, {"t": "オルバースのパラドックス", "r": "「宇宙が無限で一様なら夜空はなぜ暗いのか」という問題です。"}], "hint": "宇宙望遠鏡の名前にもなっている天文学者の名が入ります。", "src": "Claude 2026-10"}, {"id": "c1-12", "cat": "生物・医学", "q": "赤血球に含まれ、肺で酸素と結合して全身の組織に運ぶ鉄を含むタンパク質は何ですか？", "a": [{"t": "ヘモグロビン", "r": "ヘムという鉄を含む色素を持ち、血液が赤い理由でもあります。"}, {"t": "ミオグロビン", "r": "筋肉中で酸素を貯蔵するタンパク質です。"}, {"t": "アルブミン", "r": "血漿中に最も多いタンパク質で、浸透圧の維持などを担います。"}, {"t": "フィブリノゲン", "r": "血液凝固に関わるタンパク質です。"}], "hint": "「ヘム」と「グロビン」からなる名前です。", "src": "Claude 2026-10"}, {"id": "c1-13", "cat": "生物・医学", "q": "1928年、アオカビが周囲の細菌の増殖を妨げていることに気づき、世界初の抗生物質ペニシリンを発見した科学者は誰ですか？", "a": [{"t": "アレクサンダー・フレミング", "r": "偶然の発見でしたが、後にフローリーとチェインによって実用化され、3人で1945年のノーベル賞を受賞しました。"}, {"t": "ルイ・パスツール", "r": "狂犬病ワクチンや低温殺菌法で知られるフランスの科学者です。"}, {"t": "ロベルト・コッホ", "r": "結核菌やコレラ菌を発見した細菌学者です。"}, {"t": "セルマン・ワクスマン", "r": "結核に有効なストレプトマイシンを発見しました。"}], "hint": "スコットランド出身の細菌学者です。", "src": "Claude 2026-10"}, {"id": "c1-14", "cat": "科学", "q": "300年以上未解決だった「フェルマーの最終定理」を1995年に証明論文として発表したイギリスの数学者は誰ですか？", "a": [{"t": "アンドリュー・ワイルズ", "r": "谷山・志村予想（の一部）を証明することで最終定理を導きました。"}, {"t": "グリゴリー・ペレルマン", "r": "ポアンカレ予想を証明したロシアの数学者です。"}, {"t": "カール・フリードリヒ・ガウス", "r": "19世紀の大数学者ですが、この定理は証明していません。"}, {"t": "レオンハルト・オイラー", "r": "n=3の場合を証明したことで知られますが、一般の場合は証明していません。"}], "hint": "日本人数学者の名を冠した予想が証明の鍵となりました。", "src": "Claude 2026-10"}, {"id": "c1-15", "cat": "科学", "q": "パルテノン神殿や名画の構図などにも見られるとされる「黄金比」の値はおよそいくつですか？", "a": [{"t": "約1.618", "r": "(1+√5)/2 で表され、フィボナッチ数列の隣り合う項の比もこの値に近づきます。"}, {"t": "約1.414", "r": "√2で、A判・B判の用紙の縦横比です。日本では「白銀比」とも呼ばれます。"}, {"t": "約1.732", "r": "√3の値です。"}, {"t": "約2.718", "r": "自然対数の底（ネイピア数 e）です。"}], "hint": "フィボナッチ数列と深い関係があります。", "src": "Claude 2026-10"}, {"id": "c1-16", "cat": "文学", "q": "『罪と罰』『カラマーゾフの兄弟』などを著し、人間の内面の葛藤や信仰の問題を描いたロシアの作家は誰ですか？", "a": [{"t": "ドストエフスキー", "r": "思想的対話を重層的に描く作風は、20世紀の文学や哲学に大きな影響を与えました。"}, {"t": "トルストイ", "r": "『戦争と平和』『アンナ・カレーニナ』の作者です。"}, {"t": "ツルゲーネフ", "r": "『父と子』『猟人日記』の作者です。"}, {"t": "チェーホフ", "r": "『桜の園』『かもめ』などの戯曲で知られます。"}], "hint": "死刑判決を受け、執行直前に減刑されたという経験を持ちます。", "src": "Claude 2026-10"}, {"id": "c1-17", "cat": "文学", "q": "ドイツ留学の体験をもとに、エリート官僚の太田豊太郎と踊り子エリスの悲恋を雅文体で描いた小説『舞姫』の作者は誰ですか？", "a": [{"t": "森鴎外", "r": "軍医としてドイツに留学した経験を持ち、『高瀬舟』『雁』なども著しました。"}, {"t": "二葉亭四迷", "r": "言文一致体の小説『浮雲』の作者です。"}, {"t": "坪内逍遥", "r": "写実主義を説いた評論『小説神髄』の作者です。"}, {"t": "夏目漱石", "r": "イギリス留学の経験を持つ作家ですが、『舞姫』の作者ではありません。"}], "hint": "陸軍軍医総監まで務めた文豪です。", "src": "Claude 2026-10"}, {"id": "c1-18", "cat": "文学", "q": "シェイクスピアの「四大悲劇」に含まれない作品はどれですか？", "a": [{"t": "ロミオとジュリエット", "r": "有名な悲劇ですが初期の作品で、四大悲劇には数えられません。"}, {"t": "ハムレット", "r": "デンマーク王子の復讐を描いた四大悲劇の一つです。"}, {"t": "マクベス", "r": "野心に駆られたスコットランドの将軍を描いた四大悲劇の一つです。"}, {"t": "リア王", "r": "娘たちに国を分け与えた老王の悲劇で、四大悲劇の一つです。"}], "hint": "四大悲劇の残る一作は『オセロー』です。", "src": "Claude 2026-10"}, {"id": "c1-19", "cat": "芸術・音楽", "q": "『富嶽三十六景』の「神奈川沖浪裏」で知られ、ゴッホらにも影響を与えた江戸時代の浮世絵師は誰ですか？", "a": [{"t": "葛飾北斎", "r": "生涯で何度も画号を変え、90歳近くまで描き続けました。"}, {"t": "歌川広重", "r": "『東海道五十三次』で知られる風景画の名手です。"}, {"t": "喜多川歌麿", "r": "美人大首絵で知られる浮世絵師です。"}, {"t": "東洲斎写楽", "r": "役者絵で知られ、短期間で忽然と姿を消した謎の絵師です。"}], "hint": "「画狂老人卍」とも名乗りました。", "src": "Claude 2026-10"}, {"id": "c1-20", "cat": "芸術・音楽", "q": "日本で「音楽の父」バッハに対して「音楽の母」と呼ばれることのある、『メサイア』で知られるバロックの作曲家は誰ですか？", "a": [{"t": "ヘンデル", "r": "ドイツ生まれでイギリスで活躍し、『メサイア』『水上の音楽』などを残しました。この呼び名は主に日本で用いられます。"}, {"t": "ハイドン", "r": "「交響曲の父」と呼ばれる古典派の作曲家です。"}, {"t": "ヴィヴァルディ", "r": "『四季』で知られるイタリアのバロック作曲家です。"}, {"t": "モーツァルト", "r": "古典派の作曲家で「神童」として知られます。"}], "hint": "「ハレルヤ・コーラス」を含むオラトリオの作曲者です。", "src": "Claude 2026-10"}, {"id": "c1-21", "cat": "芸術・音楽", "q": "アントニ・ガウディが設計し、彼の死後も建設が続けられているサグラダ・ファミリアがある都市はどこですか？", "a": [{"t": "バルセロナ", "r": "カタルーニャ地方の中心都市で、グエル公園やカサ・ミラなどガウディ作品が多く残ります。"}, {"t": "マドリード", "r": "スペインの首都です。"}, {"t": "セビリア", "r": "アンダルシア地方の都市で、フラメンコの本場として知られます。"}, {"t": "バレンシア", "r": "パエリア発祥の地として知られる地中海沿岸の都市です。"}], "hint": "カタルーニャ州の州都です。", "src": "Claude 2026-10"}, {"id": "c1-22", "cat": "哲学・宗教", "q": "自分が何も知らないことを自覚している点で他者より賢いという「無知の知」の考え方で知られる古代ギリシャの哲学者は誰ですか？", "a": [{"t": "ソクラテス", "r": "対話（問答法）によって人々の思い込みを吟味し、最後は死刑判決を受け入れて毒杯を仰ぎました。"}, {"t": "プラトン", "r": "ソクラテスの弟子で、イデア論を説きました。"}, {"t": "アリストテレス", "r": "プラトンの弟子で「万学の祖」と呼ばれます。"}, {"t": "ディオゲネス", "r": "樽に住んだという逸話で知られる犬儒派の哲学者です。"}], "hint": "著作を残さず、その思想は弟子の対話篇によって伝えられています。", "src": "Claude 2026-10"}, {"id": "c1-23", "cat": "哲学・宗教", "q": "中央の監視塔から全ての独房を見渡せる円形の刑務所「パノプティコン」を考案した、功利主義の哲学者は誰ですか？", "a": [{"t": "ジェレミー・ベンサム", "r": "「最大多数の最大幸福」を唱えた功利主義の創始者です。"}, {"t": "ミシェル・フーコー", "r": "『監獄の誕生』でパノプティコンを近代的権力のモデルとして分析した哲学者で、考案者ではありません。"}, {"t": "ジョン・スチュアート・ミル", "r": "ベンサムの功利主義を質的に発展させた哲学者です。"}, {"t": "トマス・ホッブズ", "r": "『リヴァイアサン』で社会契約説を説いた哲学者です。"}], "hint": "「最大多数の最大幸福」で知られます。", "src": "Claude 2026-10"}, {"id": "c1-24", "cat": "哲学・宗教", "q": "「神は死んだ」という言葉で西洋の伝統的価値観の崩壊を指摘し、「超人」や「永劫回帰」の思想を説いた哲学者は誰ですか？", "a": [{"t": "ニーチェ", "r": "『ツァラトゥストラはこう語った』などで、既存の価値を超えて生を肯定する思想を展開しました。"}, {"t": "キルケゴール", "r": "「実存主義の先駆者」とされるデンマークの思想家です。"}, {"t": "ショーペンハウアー", "r": "ニーチェに影響を与えた厭世主義の哲学者です。"}, {"t": "ハイデガー", "r": "『存在と時間』を著した20世紀の哲学者です。"}], "hint": "『ツァラトゥストラはこう語った』の著者です。", "src": "Claude 2026-10"}, {"id": "c1-25", "cat": "経済・社会", "q": "『国富論』で、個人の利己的な行動が市場を通じて社会全体の利益をもたらすことを「見えざる手」と表現した経済学者は誰ですか？", "a": [{"t": "アダム・スミス", "r": "「経済学の父」と呼ばれ、分業や自由貿易の重要性を説きました。"}, {"t": "デヴィッド・リカード", "r": "比較生産費説（比較優位）を唱えた経済学者です。"}, {"t": "トマス・マルサス", "r": "『人口論』で人口増加と食料生産の関係を論じました。"}, {"t": "ジョン・メイナード・ケインズ", "r": "有効需要の原理を唱えた20世紀の経済学者です。"}], "hint": "『道徳感情論』も著したスコットランドの思想家です。", "src": "Claude 2026-10"}, {"id": "c1-26", "cat": "経済・社会", "q": "「悪貨は良貨を駆逐する」と表現される、品質の悪い貨幣が流通し良質な貨幣が退蔵されるという法則を何といいますか？", "a": [{"t": "グレシャムの法則", "r": "16世紀イギリスの財政家トーマス・グレシャムの名に由来します。"}, {"t": "セイの法則", "r": "「供給は自らの需要を創造する」という法則です。"}, {"t": "エンゲルの法則", "r": "所得が増えるほど家計に占める食費の割合が下がるという法則です。"}, {"t": "ペティ＝クラークの法則", "r": "経済発展に伴い産業の中心が第1次から第2次・第3次産業へ移るという法則です。"}], "hint": "エリザベス1世に仕えた財政家の名が付いています。", "src": "Claude 2026-10"}, {"id": "c1-27", "cat": "経済・社会", "q": "ゲーム理論で、他のプレイヤーの戦略を所与としたとき、どのプレイヤーも自分だけ戦略を変えても得をしない状態を何といいますか？", "a": [{"t": "ナッシュ均衡", "r": "数学者ジョン・ナッシュにちなみます。「囚人のジレンマ」では、ナッシュ均衡が全員にとって最善の結果にならないことが示されます。"}, {"t": "パレート最適", "r": "誰かの効用を下げずには他の誰の効用も上げられない状態です。"}, {"t": "比較優位", "r": "相対的に得意な分野に特化すると双方が得をするという貿易の考え方です。"}, {"t": "限界効用逓減", "r": "消費量が増えるほど追加1単位から得られる満足度が減るという法則です。"}], "hint": "映画『ビューティフル・マインド』のモデルとなった数学者の名前です。", "src": "Claude 2026-10"}, {"id": "c1-28", "cat": "地理", "q": "面積で世界最大の湖はどこですか？", "a": [{"t": "カスピ海", "r": "「海」と呼ばれますが陸に囲まれた塩湖で、面積は日本の国土とほぼ同じくらいです。"}, {"t": "スペリオル湖", "r": "淡水湖としては面積が世界最大級の、北米五大湖の一つです。"}, {"t": "バイカル湖", "r": "世界で最も深く、最も古い湖として知られます。"}, {"t": "ヴィクトリア湖", "r": "アフリカ最大の湖で、白ナイル川の源流です。"}], "hint": "名前に「海」が付く湖です。", "src": "Claude 2026-10"}, {"id": "c1-29", "cat": "地理", "q": "ボリビアの事実上の首都（政府所在地）で、世界で最も標高の高い首都機能を持つ都市はどこですか？", "a": [{"t": "ラパス", "r": "標高約3,600mに位置します。憲法上の首都はスクレです。"}, {"t": "スクレ", "r": "ボリビアの憲法上の首都で、最高裁判所が置かれています。"}, {"t": "キト", "r": "エクアドルの首都で、標高約2,800mにあります。"}, {"t": "ボゴタ", "r": "コロンビアの首都で、標高約2,600mにあります。"}], "hint": "スペイン語で「平和」を意味する言葉が入っています。", "src": "Claude 2026-10"}, {"id": "c1-30", "cat": "地理", "q": "ケッペンの気候区分で、東京や上海が属する、夏は高温多湿で四季が明瞭な気候を何といいますか？", "a": [{"t": "温暖湿潤気候（Cfa）", "r": "大陸の東岸に多く見られ、夏の降水量が多いのが特徴です。"}, {"t": "西岸海洋性気候（Cfb）", "r": "ロンドンやパリなど、大陸西岸の夏が涼しい気候です。"}, {"t": "地中海性気候（Cs）", "r": "夏に乾燥し冬に雨が多い気候です。"}, {"t": "亜寒帯湿潤気候（Df）", "r": "札幌などが属する、冬の寒さが厳しい気候です。"}], "hint": "記号の3文字目のaは「最暖月が22℃以上」を意味します。", "src": "Claude 2026-10"}, {"id": "c1-31", "cat": "地理", "q": "経度0度の基準となる本初子午線が通る、旧王立天文台があるロンドンの地区はどこですか？", "a": [{"t": "グリニッジ", "r": "1884年の国際子午線会議でこの地を通る子午線が経度の基準と定められました。"}, {"t": "ウェストミンスター", "r": "国会議事堂やウェストミンスター寺院がある地区です。"}, {"t": "ケンジントン", "r": "博物館や宮殿がある高級住宅地です。"}, {"t": "ウィンブルドン", "r": "テニスの大会で知られる地区です。"}], "hint": "世界時の旧称「GMT」の頭文字にもなっています。", "src": "Claude 2026-10"}, {"id": "c1-32", "cat": "言葉・語源", "q": "英単語 salary（給料）の語源となったラテン語 salarium は、ある物に由来するとされます。それは何ですか？", "a": [{"t": "塩", "r": "ラテン語の sal（塩）に由来します。古代ローマで兵士に塩を買うための手当が支給されたという説が広く知られますが、詳細には諸説あります。"}, {"t": "銀", "r": "銀を意味するラテン語は argentum です。"}, {"t": "小麦", "r": "小麦は salary の語源ではありません。"}, {"t": "兵士", "r": "soldier は solidus（金貨）に由来する別系統の語です。"}], "hint": "「サラダ（salad）」も同じ語に由来します。", "src": "Claude 2026-10"}, {"id": "c1-33", "cat": "言葉・語源", "q": "英語 quarantine（検疫・隔離）の語源となった、ヴェネツィアで疫病対策として船を沖に停泊させた期間は何日ですか？", "a": [{"t": "40日", "r": "イタリア語（ヴェネツィア方言）の quaranta giorni（40日）に由来します。"}, {"t": "14日", "r": "現代の潜伏期間の目安として使われることはありますが語源ではありません。"}, {"t": "30日", "r": "当初30日間の隔離が行われた記録もありますが、語源となったのは40日です。"}, {"t": "100日", "r": "語源とは関係ありません。"}], "hint": "イタリア語で quaranta は数字の何でしょう。", "src": "Claude 2026-10"}, {"id": "c1-34", "cat": "言葉・語源", "q": "ことわざ「情けは人のためならず」の本来の意味として正しいのはどれですか？", "a": [{"t": "人に親切にすれば、巡り巡って自分に良い報いが返ってくる", "r": "「ためならず」は「（その人の）ためだけではない」の意味です。"}, {"t": "人に情けをかけて甘やかすと、その人のためにならない", "r": "よくある誤用です。文化庁の調査でもこの意味で理解している人が少なくありません。"}, {"t": "情けをかけるより厳しく接する方が相手のためになる", "r": "本来の意味ではありません。"}, {"t": "人の情けにすがってばかりいてはいけない", "r": "本来の意味ではありません。"}], "hint": "「ためならず」の「なり＋ず」がポイントです。", "src": "Claude 2026-10"}, {"id": "c1-35", "cat": "言葉・語源", "q": "「役不足」の本来の意味として正しいのはどれですか？", "a": [{"t": "その人の力量に比べて、与えられた役目が軽すぎること", "r": "「私には役不足です」と謙遜に使うのは本来の意味とは逆の誤用です。"}, {"t": "与えられた役目に対して、その人の力量が足りないこと", "r": "これは「力不足」の意味で、典型的な誤用です。"}, {"t": "役者の人数が足りないこと", "r": "本来の意味ではありません。"}, {"t": "役目を果たす時間が足りないこと", "r": "本来の意味ではありません。"}], "hint": "力量が足りないのは「力不足」です。", "src": "Claude 2026-10"}, {"id": "c1-36", "cat": "言葉・語源", "q": "思いがけない幸運な発見を意味する英単語 serendipity を、ペルシャの寓話をもとに1754年に造語したイギリスの作家は誰ですか？", "a": [{"t": "ホレス・ウォルポール", "r": "寓話『セレンディップの三人の王子』（セレンディップはスリランカの古名）にちなんで手紙の中で用いました。"}, {"t": "サミュエル・ジョンソン", "r": "18世紀に英語辞典を編纂した文学者です。"}, {"t": "ルイス・キャロル", "r": "chortle など多くの造語を生んだ作家ですが、この語の造語者ではありません。"}, {"t": "シェイクスピア", "r": "多くの語や表現を英語にもたらしましたが、この語は彼のものではありません。"}], "hint": "ゴシック小説『オトラント城』の作者です。", "src": "Claude 2026-10"}, {"id": "c1-37", "cat": "最新トピック", "q": "2024年のノーベル物理学賞は、人工ニューラルネットワークによる機械学習を可能にした基礎的発見に贈られました。ジョン・ホップフィールドとともに受賞した研究者は誰ですか？", "a": [{"t": "ジェフリー・ヒントン", "r": "ボルツマンマシンなどの研究で知られ、「ディープラーニングのゴッドファーザー」とも呼ばれます。"}, {"t": "ヤン・ルカン", "r": "畳み込みニューラルネットワークの研究で知られ、2018年にヒントンらとチューリング賞を受賞しましたが、ノーベル賞は受賞していません。"}, {"t": "ヨシュア・ベンジオ", "r": "2018年チューリング賞の共同受賞者ですが、ノーベル賞は受賞していません。"}, {"t": "デミス・ハサビス", "r": "同じ2024年にノーベル化学賞を受賞した人物です。"}], "hint": "ボルツマンマシンを考案した研究者の一人です。", "src": "Claude 2026-10", "asOf": "2024年"}, {"id": "c1-38", "cat": "最新トピック", "q": "2024年のノーベル化学賞で、デミス・ハサビスとジョン・ジャンパーが評価された、AI「AlphaFold」の成果は何ですか？", "a": [{"t": "タンパク質の立体構造予測", "r": "アミノ酸配列からタンパク質の立体構造を高精度で予測しました。同年はデイヴィッド・ベイカーもタンパク質の設計で共同受賞しています。"}, {"t": "新しい元素の発見", "r": "AlphaFoldとは関係ありません。"}, {"t": "ゲノム編集技術の開発", "r": "CRISPR-Cas9によるゲノム編集は2020年のノーベル化学賞です。"}, {"t": "リチウムイオン電池の開発", "r": "2019年のノーベル化学賞（吉野彰ら）です。"}], "hint": "生体分子の「形」に関する長年の難問でした。", "src": "Claude 2026-10", "asOf": "2024年"}, {"id": "c1-39", "cat": "最新トピック", "q": "2025年のノーベル生理学・医学賞を受賞した坂口志文氏らの業績は、何の発見に関するものですか？", "a": [{"t": "制御性T細胞（末梢性免疫寛容）", "r": "免疫が自分の体を攻撃しないよう抑える細胞の発見で、自己免疫疾患やがん治療への応用が期待されています。"}, {"t": "iPS細胞", "r": "2012年に山中伸弥氏が受賞した業績です。"}, {"t": "オートファジー", "r": "2016年に大隅良典氏が受賞した業績です。"}, {"t": "PD-1（免疫チェックポイント）", "r": "2018年に本庶佑氏が受賞した業績です。"}], "hint": "免疫の「ブレーキ役」となる細胞です。", "src": "Claude 2026-10", "asOf": "2025年"}, {"id": "c1-40", "cat": "最新トピック", "q": "2025年のノーベル化学賞を受賞した北川進氏らの業績で、無数の微細な穴を持ち気体の貯蔵や分離に使える材料を何といいますか？", "a": [{"t": "金属有機構造体（MOF）", "r": "金属イオンと有機分子を組み合わせた多孔性の材料で、二酸化炭素の回収などへの応用が期待されています。"}, {"t": "導電性高分子", "r": "2000年に白川英樹氏らが受賞した業績です。"}, {"t": "青色発光ダイオード", "r": "2014年に赤崎勇・天野浩・中村修二の3氏がノーベル物理学賞を受賞した業績です。"}, {"t": "リチウムイオン電池", "r": "2019年に吉野彰氏らが受賞した業績です。"}], "hint": "「多孔性配位高分子（PCP）」とも呼ばれます。", "src": "Claude 2026-10", "asOf": "2025年"}, {"id": "c1-41", "cat": "最新トピック", "q": "2025年のノーベル物理学賞（クラーク、ドゥヴォレ、マルティニスの3氏）で評価された業績は何ですか？", "a": [{"t": "電気回路における巨視的な量子トンネル効果とエネルギーの量子化", "r": "手で持てる大きさの超伝導回路でも量子力学的な振る舞いが起こることを示し、量子コンピュータ研究の基盤となりました。"}, {"t": "重力波の初観測", "r": "2017年のノーベル物理学賞です。"}, {"t": "アト秒パルス光の生成", "r": "2023年のノーベル物理学賞です。"}, {"t": "量子もつれの実験的検証", "r": "2022年のノーベル物理学賞です。"}], "hint": "超伝導回路を用いた実験です。", "src": "Claude 2026-10", "asOf": "2025年"}, {"id": "c1-42", "cat": "最新トピック", "q": "2025年5月のコンクラーベで選出された、アメリカ出身として初のローマ教皇の名は何ですか？", "a": [{"t": "レオ14世", "r": "ロバート・フランシス・プレボスト枢機卿が選出され、教皇名レオ14世を名乗りました。"}, {"t": "フランシスコ", "r": "2013年に選出された前教皇で、2025年4月に死去しました。"}, {"t": "ベネディクト16世", "r": "2013年に生前退位した教皇です。"}, {"t": "ヨハネ23世", "r": "第2バチカン公会議を招集した20世紀の教皇です。"}], "hint": "19世紀末に『レールム・ノヴァールム』を出した教皇と同じ名を選びました。", "src": "Claude 2026-10", "asOf": "2025年"}, {"id": "c1-43", "cat": "最新トピック", "q": "2024年、国際地質科学連合の小委員会が地質時代の正式区分として採用しないと決定した、人類の活動が地球環境に大きな影響を与えた時代を表す区分案は何ですか？", "a": [{"t": "人新世（アントロポセン）", "r": "学術的・社会的には広く使われる概念ですが、正式な地質時代区分としては否決されました。"}, {"t": "完新世", "r": "約1万1700年前から現在までを指す、現行の正式な区分です。"}, {"t": "更新世", "r": "約258万年前から約1万1700年前までの、氷期と間氷期を繰り返した時代です。"}, {"t": "チバニアン", "r": "2020年に正式に命名された、更新世中期の区分です。"}], "hint": "ノーベル化学賞受賞者パウル・クルッツェンらが提唱した言葉です。", "src": "Claude 2026-10", "asOf": "2024年"}, {"id": "c1-44", "cat": "科学", "q": "2020年に地質時代の名称として正式に決まった「チバニアン」の境界の決め手となった、千葉県市原市の地層に記録されている現象は何ですか？", "a": [{"t": "地磁気の逆転", "r": "約77万年前に地磁気のN極とS極が最後に入れ替わった痕跡が、地層に良好に記録されています。"}, {"t": "巨大隕石の衝突", "r": "白亜紀末の恐竜絶滅に関係する現象です。"}, {"t": "全球凍結", "r": "原生代に地球全体が氷に覆われたとされる現象です。"}, {"t": "大規模火山噴火", "r": "チバニアンの境界の決め手ではありません。"}], "hint": "方位磁針の向きに関わる現象です。", "src": "Claude 2026-10"}, {"id": "c1-45", "cat": "最新トピック", "q": "2025年に開催された大阪・関西万博の会場となった、大阪湾の人工島はどこですか？", "a": [{"t": "夢洲（ゆめしま）", "r": "2025年4月から10月まで開催され、会場を囲む大屋根リングが話題となりました。"}, {"t": "舞洲（まいしま）", "r": "夢洲の北にある人工島で、スポーツ施設などがあります。"}, {"t": "咲洲（さきしま）", "r": "大阪南港の人工島で、ATCなどがあります。"}, {"t": "千里丘陵", "r": "1970年の日本万国博覧会の会場で、現在は万博記念公園になっています。"}], "hint": "跡地には統合型リゾート（IR）の計画もあります。", "src": "Claude 2026-10", "asOf": "2025年"}, {"id": "c1-46", "cat": "最新トピック", "q": "国連の推計で、2023年に中国を抜いて世界で最も人口の多い国になったとされるのはどこですか？", "a": [{"t": "インド", "r": "国連人口基金（UNFPA）の推計で、2023年半ばに中国を上回ったとされました。"}, {"t": "中国", "r": "長年世界最多でしたが、人口減少局面に入りました。"}, {"t": "アメリカ", "r": "世界第3位の人口大国です。"}, {"t": "インドネシア", "r": "世界第4位の人口大国です。"}], "hint": "世界人口は2022年11月に80億人に達したとされます。", "src": "Claude 2026-10", "asOf": "2023年"}, {"id": "c1-47", "cat": "科学", "q": "ハッブル宇宙望遠鏡の後継として2021年に打ち上げられ、主に赤外線で初期宇宙を観測している宇宙望遠鏡は何ですか？", "a": [{"t": "ジェイムズ・ウェッブ宇宙望遠鏡", "r": "直径6.5mの主鏡を持ち、地球から約150万km離れたラグランジュ点L2付近で観測しています。"}, {"t": "スピッツァー宇宙望遠鏡", "r": "2003年に打ち上げられた赤外線望遠鏡で、2020年に運用を終えました。"}, {"t": "ケプラー宇宙望遠鏡", "r": "系外惑星の探索に特化した望遠鏡で、2018年に運用を終えました。"}, {"t": "ナンシー・グレース・ローマン宇宙望遠鏡", "r": "広い視野で観測するNASAの赤外線宇宙望遠鏡として計画されたものです。"}], "hint": "アポロ計画時代のNASA長官の名が付いています。", "src": "Claude 2026-10"}, {"id": "c1-48", "cat": "日本史", "q": "2024年7月に発行が始まった新しい千円札の肖像に選ばれ、破傷風の血清療法を確立したことで知られる人物は誰ですか？", "a": [{"t": "北里柴三郎", "r": "「日本の近代医学の父」と呼ばれ、ペスト菌の発見でも知られます。"}, {"t": "野口英世", "r": "旧千円札（2004年発行）の肖像です。"}, {"t": "渋沢栄一", "r": "新一万円札の肖像です。"}, {"t": "志賀潔", "r": "北里柴三郎の門下で赤痢菌を発見した細菌学者です。"}], "hint": "北里大学の名前の由来となった人物です。", "src": "Claude 2026-10"}];
+const BANK_VERSION = "問題セット 2026-10-08";
+const CATS = ["世界史","日本史","科学","生物・医学","文学","芸術・音楽","哲学・宗教","経済・社会","地理","言葉・語源","最新トピック"];
+const KEY = "memoria-sapientia-v1";
+
+/* ---------- storage ---------- */
+let storageOK = true;
+function blankState(){
+  return {v:1, cards:{}, custom:[], flags:{}, log:{}, settings:{size:10,newPerDay:10,recall:false,hintHard:true}, lastBackup:null};
+}
+let S = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return blankState();
+    const s = JSON.parse(raw), b = blankState();
+    return Object.assign(b, s, {settings:Object.assign(b.settings, s.settings||{})});
+  }catch(e){ storageOK=false; return blankState(); }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ if(storageOK){ storageOK=false; toast("保存できません（ブラウザの保存領域が使えない状態です）"); } }
+}
+
+/* ---------- utils ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function today(){ return ymd(new Date()); }
+function addDays(s,n){ const [y,m,d]=s.split("-").map(Number); return ymd(new Date(y,m-1,d+n)); }
+function dayDiff(a,b){ const p=s=>{const [y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)}; return Math.round((p(b)-p(a))/864e5); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function norm(s){ return String(s||"").replace(/[\s　、。，．,.!?！？「」『』（）()・\-ー〜~]/g,"").toLowerCase(); }
+let toastT; function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),2200); }
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); let ok=false; try{ok=document.execCommand("copy");}catch(_){} ta.remove(); return ok; }
+}
+
+/* ---------- questions ---------- */
+function allQ(){ return BANK.concat(S.custom); }
+let QMAP = {};
+function rebuildMap(){ QMAP={}; allQ().forEach(q=>QMAP[q.id]=q); }
+rebuildMap();
+function activeQ(){ return allQ().filter(q=>!S.flags[q.id]); }
+function allCats(){ const set=new Set(CATS); allQ().forEach(q=>set.add(q.cat)); return [...set]; }
+
+/* ---------- scheduling (SM-2 variant, day based) ---------- */
+function card(id){ return S.cards[id] || {ef:2.5,iv:0,reps:0,lapses:0,seen:0,ok:0,due:null,last:null,hist:[]}; }
+function isMastered(c){ return c.seen>0 && c.iv>=21; }
+function isWeak(c){ return c.seen>0 && (c.hist.slice(-1)[0]===0 || c.ef<2.2 || (c.lapses>0 && c.iv<8)); }
+function weight(c){
+  if(!c.seen) return 1.2;
+  let w = 1 + 4*(c.lapses/c.seen) + Math.max(0,(2.5-c.ef))*3;
+  const last=c.hist.slice(-1)[0];
+  if(last===0) w+=3; else if(last===1) w+=1.2;
+  if(isMastered(c)) w*=.3;
+  return Math.max(.15,w);
+}
+function predictIv(c,g){
+  if(g===0) return 1;
+  if(g===1) return c.reps===0?1:Math.max(2,Math.round(c.iv*1.2));
+  return c.reps===0?3 : c.reps===1?8 : Math.round(c.iv*c.ef);
+}
+function grade(id,g){
+  const c = card(id), t = today();
+  const first = !c.seen;
+  c.seen++; if(g>0) c.ok++;
+  let iv = predictIv(c,g);
+  if(g===0){ c.lapses++; c.reps=0; c.ef=Math.max(1.3,c.ef-.2); }
+  else if(g===1){ c.ef=Math.max(1.3,c.ef-.15); c.reps++; }
+  else { c.ef=Math.min(3,c.ef+.05); c.reps++; }
+  if(iv>4) iv = Math.max(1, Math.round(iv*(0.9+Math.random()*0.2)));
+  c.iv=iv; c.due=addDays(t,iv); c.last=t;
+  c.hist=(c.hist||[]).concat(g).slice(-10);
+  S.cards[id]=c;
+  const L = S.log[t] || (S.log[t]={n:0,ok:0,nw:0});
+  L.n++; if(g>0) L.ok++; if(first) L.nw++;
+  save();
+  return iv;
+}
+function dueList(){
+  const t=today();
+  return activeQ().filter(q=>{const c=S.cards[q.id];return c&&c.seen&&c.due&&c.due<=t;})
+    .sort((a,b)=>{const ca=S.cards[a.id],cb=S.cards[b.id];return ca.due<cb.due?-1:ca.due>cb.due?1:ca.ef-cb.ef;});
+}
+function newRemaining(){ const L=S.log[today()]; return Math.max(0,S.settings.newPerDay-(L?L.nw:0)); }
+function weightedPick(qs,n){
+  const pool=qs.map(q=>({q,w:weight(card(q.id))})), out=[];
+  while(out.length<n && pool.length){
+    let sum=pool.reduce((s,x)=>s+x.w,0), r=Math.random()*sum, i=0;
+    for(;i<pool.length;i++){ r-=pool[i].w; if(r<=0) break; }
+    out.push(pool.splice(Math.min(i,pool.length-1),1)[0].q);
+  }
+  return out;
+}
+function buildSession(mode,arg){
+  const N=S.settings.size;
+  if(mode==="daily"){
+    const due=dueList().slice(0,N);
+    const unseen=shuffle(activeQ().filter(q=>!card(q.id).seen));
+    const nw=unseen.slice(0,Math.min(newRemaining(),N-due.length));
+    return shuffle(due.concat(nw));
+  }
+  if(mode==="weak"){
+    let seen=activeQ().filter(q=>card(q.id).seen);
+    const weak=seen.filter(q=>isWeak(card(q.id)));
+    const base = weak.length>=N ? weak : seen;
+    return weightedPick(base,N);
+  }
+  if(mode==="cat") return weightedPick(activeQ().filter(q=>q.cat===arg),N);
+  if(mode==="latest") return weightedPick(activeQ().filter(q=>q.asOf),N);
+  return weightedPick(activeQ(),N);
+}
+
+/* ---------- views ---------- */
+let curTab="home";
+function show(v){
+  ["home","quiz","result","lib","add","set"].forEach(x=>$("v-"+x).classList.toggle("hide",x!==v));
+  document.querySelector("nav.tabs").classList.toggle("hide",v==="quiz");
+  window.scrollTo(0,0);
+}
+function tab(t){
+  curTab=t;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+  show(t);
+  ({home:renderHome,lib:renderLib,add:renderAdd,set:renderSet})[t]();
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+
+/* ---------- home ---------- */
+function streak(){
+  let d=today(), n=0;
+  if(!(S.log[d]&&S.log[d].n)) d=addDays(d,-1);
+  while(S.log[d]&&S.log[d].n){ n++; d=addDays(d,-1); }
+  return n;
+}
+function renderHome(){
+  const st=streak(), L=S.log[today()];
+  $("kStreak").textContent=st; $("hdrStreak").textContent= st? "🔥 "+st+"日連続" : "";
+  $("hdrStreak").classList.toggle("hide",!st);
+  $("kToday").textContent=L?L.n:0;
+  let n=0,ok=0; for(let i=0;i<30;i++){const l=S.log[addDays(today(),-i)]; if(l){n+=l.n;ok+=l.ok;}}
+  $("kAcc").textContent=n?Math.round(ok/n*100)+"%":"–";
+  const due=dueList().length, unseen=activeQ().filter(q=>!card(q.id).seen).length;
+  const nw=Math.min(newRemaining(),unseen);
+  const planned=Math.min(S.settings.size,due+nw);
+  const dueIn = Math.min(due,S.settings.size), nwIn=Math.min(nw,S.settings.size-dueIn);
+  $("btnDaily").disabled=!planned;
+  $("btnDaily").textContent= planned? "今日の学習を始める（"+planned+"問）" : "今日の分は完了しました";
+  $("dailyInfo").textContent= planned
+    ? "復習期限の問題 "+due+"問・新しい問題 残り"+nw+"問"+(due>S.settings.size?"（セットを繰り返すと残りも出題されます）":"")+(dueIn?"":"")
+    : (unseen? "新規問題は1日の上限に達しました。下のモードで追加練習できます。" : "全問題を出題済みです。「問題を追加」から新しい問題を増やせます。");
+  // backup reminder
+  const custN=S.custom.length, seenN=Object.keys(S.cards).length;
+  const days = S.lastBackup? dayDiff(S.lastBackup.slice(0,10),today()) : null;
+  $("backupNote").innerHTML = (seenN>20 && (days===null||days>=14))
+    ? `<div class="note warn" style="margin-bottom:14px">学習記録はこのブラウザにだけ保存されています。${days===null?"まだ一度もバックアップしていません":"最後のバックアップから"+days+"日経過"}。<a href="#" id="goBk" style="color:inherit;font-weight:700">設定から書き出す</a></div>` : "";
+  const gb=$("goBk"); if(gb) gb.onclick=e=>{e.preventDefault();tab("set");};
+  if(!storageOK) $("backupNote").innerHTML='<div class="note warn" style="margin-bottom:14px">このブラウザでは保存領域が使えないため、記録が残りません。通常のブラウザ（プライベートモード以外）で開いてください。</div>';
+  // mastery
+  const qs=activeQ(); let m=0,l=0,w=0,u=0;
+  qs.forEach(q=>{const c=card(q.id); if(!c.seen)u++; else if(isMastered(c))m++; else if(isWeak(c))w++; else l++;});
+  const tot=qs.length||1, seg=(v,c)=>`<i style="width:${v/tot*100}%;background:${c}"></i>`;
+  $("masteryBar").innerHTML=seg(m,"var(--ok)")+seg(l,"var(--accent)")+seg(w,"var(--ng)");
+  $("masteryLegend").innerHTML=`<span style="--c:var(--ok)">習得 ${m}</span><span style="--c:var(--accent)">学習中 ${l}</span><span style="--c:var(--ng)">苦手 ${w}</span><span style="--c:var(--heat0)">未出題 ${u}</span>`;
+  // heatmap
+  const weeks=18, end=new Date(), start=new Date(end); start.setDate(end.getDate()-(weeks*7-1)-end.getDay());
+  let h=""; const cells=Math.round((end-start)/864e5)+1;
+  for(let i=0;i<cells;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d),v=S.log[k]?S.log[k].n:0;
+    const lv=v===0?0:v<5?1:v<10?2:v<20?3:4; h+=`<i title="${k}：${v}問" style="background:var(--heat${lv})"></i>`;}
+  $("heat").innerHTML=h;
+  // category stats
+  const rows=allCats().map(cat=>{let s=0,o=0,cnt=0; qs.filter(q=>q.cat===cat).forEach(q=>{cnt++;const c=card(q.id);s+=c.seen;o+=c.ok;}); return {cat,s,o,cnt};}).filter(r=>r.cnt);
+  $("catStats").innerHTML=rows.map(r=>{const p=r.s?Math.round(r.o/r.s*100):null;
+    const col=p===null?"var(--heat0)":p>=80?"var(--ok)":p>=60?"var(--accent)":"var(--ng)";
+    return `<div class="catrow"><span>${esc(r.cat)}</span><div class="bar"><i style="width:${p??0}%;background:${col}"></i></div><em>${p===null?"未":p+"%"} <small class="muted">/${r.cnt}</small></em></div>`;}).join("");
+  // cat picker
+  $("catPick").innerHTML='<option value="">分野を選ぶ…</option>'+allCats().map(c=>`<option>${esc(c)}</option>`).join("");
+}
+$("btnDaily").onclick=()=>startSession("daily");
+document.querySelectorAll(".modes .btn").forEach(b=>b.onclick=()=>{
+  const m=b.dataset.mode;
+  if(m==="cat"){ $("catPick").classList.toggle("hide"); return; }
+  startSession(m);
+});
+$("catPick").onchange=e=>{ if(e.target.value) startSession("cat",e.target.value); };
+
+/* ---------- quiz ---------- */
+let Q=null; // session
+function startSession(mode,arg){
+  const items=buildSession(mode,arg);
+  if(!items.length){ toast(mode==="weak"?"まだ解いた問題がありません":"出題できる問題がありません"); return; }
+  Q={mode,arg,queue:items.map(q=>({id:q.id,retry:0})),pos:0,total:items.length,results:{},order:items.map(q=>q.id),answered:false,hintUsed:false};
+  show("quiz"); renderQ();
+}
+function renderQ(){
+  const it=Q.queue[Q.pos], q=QMAP[it.id];
+  Q.answered=false; Q.hintUsed=false; Q.opts=shuffle(q.a.map((o,i)=>({...o,correct:i===0})));
+  Q.revealed=!S.settings.recall || it.retry>0;
+  const done=Object.keys(Q.results).length;
+  $("progBar").style.width=(done/Q.total*100)+"%";
+  $("progText").textContent=Math.min(done+1,Q.total)+" / "+Q.total+(it.retry?"（再挑戦）":"");
+  const c=card(q.id);
+  let meta=`<span class="chip">${esc(q.cat)}</span>`;
+  if(q.asOf) meta+=`<span class="chip warn">${esc(q.asOf)}時点の情報</span>`;
+  if(!c.seen) meta+=`<span class="chip ok">NEW</span>`; else if(isWeak(c)) meta+=`<span class="chip ng">苦手</span>`;
+  if(it.retry) meta+=`<span class="chip ng">もう一度</span>`;
+  $("qMeta").innerHTML=meta;
+  $("qText").textContent=q.q;
+  $("qHint").innerHTML=q.hint?`<button class="btn small ghost" id="hintBtn" style="margin-top:12px">💡 ヒント</button>`:"";
+  if(q.hint) $("hintBtn").onclick=showHint;
+  $("qFb").innerHTML="";
+  renderOpts();
+}
+function renderOpts(){
+  if(!Q.revealed){
+    $("qBody").innerHTML=`<div class="recall">答えを頭の中で思い浮かべてから<br><button class="btn primary" id="revealBtn" style="margin-top:12px">選択肢を表示 <kbd>Space</kbd></button></div>`;
+    $("revealBtn").onclick=()=>{Q.revealed=true;renderOpts();};
+    return;
+  }
+  $("qBody").innerHTML='<div class="opts">'+Q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${i+1}</span><span>${esc(o.t)}</span></button>`).join("")+'</div>';
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+}
+function showHint(){
+  const q=QMAP[Q.queue[Q.pos].id]; if(!q.hint||Q.answered) return;
+  Q.hintUsed=true; $("qHint").innerHTML=`<div class="hintbox">💡 ${esc(q.hint)}</div>`;
+}
+function answer(i){
+  if(Q.answered||!Q.revealed) return;
+  Q.answered=true;
+  if(!Q.hintUsed) $("qHint").innerHTML="";
+  const it=Q.queue[Q.pos], q=QMAP[it.id], o=Q.opts[i], ok=o.correct, first=!it.retry;
+  document.querySelectorAll(".opt").forEach((b,j)=>{ b.disabled=true;
+    if(Q.opts[j].correct) b.classList.add("correct"); else if(j===i) b.classList.add("wrong"); else b.classList.add("dim"); });
+  const cor=Q.opts.find(x=>x.correct), c=card(q.id);
+  let html=`<div class="fb ${ok?"ok":"ng"}"><h3>${ok?"✓ 正解":"✕ 不正解"}　<span style="font-weight:600">${esc(cor.t)}</span></h3><p>${esc(cor.r||"")}</p>`;
+  if(!ok) html+=`<p class="sub" style="font-size:13px">あなたの答え「${esc(o.t)}」：${esc(o.r||"")}</p>`;
+  const others=Q.opts.filter(x=>!x.correct&&x!==o&&x.r);
+  if(others.length) html+=`<details><summary>他の選択肢の解説</summary><ul>${others.map(x=>`<li><b>${esc(x.t)}</b>：${esc(x.r)}</li>`).join("")}</ul></details>`;
+  html+=`</div>`;
+  if(!first){
+    html+=`<div class="gradebar"><button class="btn primary" id="gNext">次へ <kbd>Enter</kbd></button></div>`;
+    if(!ok && it.retry<2) Q.queue.splice(Math.min(Q.pos+3,Q.queue.length),0,{id:it.id,retry:it.retry+1});
+  }else if(ok){
+    const hard=Q.hintUsed&&S.settings.hintHard;
+    html+= hard
+      ? `<div class="gradebar"><button class="btn primary" data-g="1">次へ<small>ヒントあり → 次回 ${fmtIv(predictIv(c,1))}</small></button></div>`
+      : `<div class="gradebar"><button class="btn" data-g="1">あやふや <kbd>1</kbd><small>次回 ${fmtIv(predictIv(c,1))}</small></button><button class="btn primary" data-g="2">確信あり <kbd>2</kbd><small>次回 ${fmtIv(predictIv(c,2))}</small></button></div>`;
+  }else{
+    html+=`<div class="gradebar"><button class="btn primary" data-g="0">次へ <kbd>Enter</kbd><small>このセット内でもう一度出題します</small></button></div>`;
+  }
+  html+=`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn small ghost" id="flagBtn">${S.flags[q.id]?"⚑ 疑義ありを解除":"⚑ この問題に疑義あり"}</button></div>`;
+  $("qFb").innerHTML=html;
+  $("qFb").querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>commit(+b.dataset.g));
+  if($("gNext")) $("gNext").onclick=next;
+  $("flagBtn").onclick=()=>{ if(S.flags[q.id]) delete S.flags[q.id]; else S.flags[q.id]={at:today()}; save();
+    $("flagBtn").textContent=S.flags[q.id]?"⚑ 疑義ありを解除":"⚑ この問題に疑義あり"; toast(S.flags[q.id]?"疑義ありにしました（今後は出題されません）":"解除しました"); };
+  Q.lastOk=ok;
+  $("qFb").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function fmtIv(d){ return d<=1?"明日":d<31?d+"日後":d<365?Math.round(d/30)+"か月後":"1年以上後"; }
+function commit(g){
+  const it=Q.queue[Q.pos];
+  grade(it.id,g);
+  Q.results[it.id]=g;
+  if(g===0) Q.queue.splice(Math.min(Q.pos+3,Q.queue.length),0,{id:it.id,retry:1});
+  next();
+}
+function next(){
+  Q.pos++;
+  if(Q.pos>=Q.queue.length) return finish();
+  renderQ(); window.scrollTo(0,0);
+}
+function finish(){
+  const ids=Q.order, r=Q.results, n=ids.filter(id=>id in r).length, ok=ids.filter(id=>r[id]>0).length;
+  $("rScore").textContent=n?Math.round(ok/n*100)+"%":"–";
+  $("rSub").textContent=`${n}問中 ${ok}問正解 ・ 🔥 ${streak()}日連続`;
+  $("rList").innerHTML=ids.filter(id=>id in r).map(id=>{const q=QMAP[id],g=r[id];
+    return `<li>${g===0?"✕":g===1?"△":"○"} ${esc(q.a[0].t)} <span class="muted" style="font-size:12px">— ${esc(q.cat)}</span></li>`;}).join("");
+  show("result");
+}
+$("rHome").onclick=()=>tab("home");
+$("rAgain").onclick=()=>startSession(Q.mode,Q.arg);
+$("quitBtn").onclick=()=>{ if(Object.keys(Q.results).length) finish(); else tab("home"); };
+document.addEventListener("keydown",e=>{
+  if($("v-quiz").classList.contains("hide")||e.ctrlKey||e.metaKey||e.altKey) return;
+  const k=e.key;
+  if(!Q.answered){
+    if(!Q.revealed && (k===" "||k==="Enter")){ e.preventDefault(); Q.revealed=true; renderOpts(); return; }
+    if(/^[1-6]$/.test(k) && Q.revealed && +k<=Q.opts.length) answer(+k-1);
+    else if(k==="h"||k==="H") showHint();
+    return;
+  }
+  const bar=$("qFb");
+  if(k==="Enter"||k===" "){ e.preventDefault(); const b=bar.querySelector("#gNext")||bar.querySelector("[data-g='2']")||bar.querySelector("[data-g]"); b&&b.click(); }
+  else if(k==="1"){ const b=bar.querySelector("[data-g='1']"); b&&b.click(); }
+  else if(k==="2"){ const b=bar.querySelector("[data-g='2']"); b&&b.click(); }
+});
+
+/* ---------- library ---------- */
+function renderLib(){
+  const cs=allCats();
+  if(!$("libCat").options.length) $("libCat").innerHTML='<option value="">全分野</option>'+cs.map(c=>`<option>${esc(c)}</option>`).join("");
+  const kw=norm($("libSearch").value), cat=$("libCat").value, st=$("libStatus").value;
+  const list=allQ().filter(q=>{
+    if(cat&&q.cat!==cat) return false;
+    if(kw && !norm(q.q+q.a.map(a=>a.t).join("")).includes(kw)) return false;
+    const c=card(q.id), fl=!!S.flags[q.id];
+    if(st==="flag") return fl;
+    if(st==="custom") return q.id[0]==="u";
+    if(fl) return st==="all";
+    if(st==="weak") return isWeak(c);
+    if(st==="new") return !c.seen;
+    if(st==="mastered") return isMastered(c);
+    return true;
+  });
+  $("libCount").textContent=list.length+"問を表示（全"+allQ().length+"問・疑義あり"+Object.keys(S.flags).length+"問）";
+  $("libList").innerHTML=list.map(q=>{const c=card(q.id);
+    const stt=S.flags[q.id]?'<span class="chip warn">疑義あり</span>':!c.seen?"未出題":`${c.ok}/${c.seen} 正解・次回 ${c.due?c.due.slice(5).replace("-","/"):"–"}`;
+    return `<div class="qitem" data-id="${esc(q.id)}"><div class="t">${esc(q.q)}</div><div class="m"><span>${esc(q.cat)}</span><span>${stt}</span>${isWeak(c)?'<span style="color:var(--ng)">苦手</span>':""}${q.asOf?`<span>${esc(q.asOf)}時点</span>`:""}</div></div>`;}).join("") || '<p class="muted">該当する問題はありません</p>';
+  document.querySelectorAll(".qitem").forEach(el=>el.onclick=e=>{ if(e.target.closest(".qdetail")) return; toggleDetail(el); });
+}
+function toggleDetail(el){
+  const open=el.classList.toggle("open"), id=el.dataset.id, q=QMAP[id];
+  const d=el.querySelector(".qdetail"); if(d) d.remove();
+  if(!open) return;
+  const custom=id[0]==="u";
+  const box=document.createElement("div"); box.className="qdetail";
+  box.innerHTML=`<ol>${q.a.map((a,i)=>`<li>${i===0?"<b>✓ "+esc(a.t)+"</b>":esc(a.t)}<div class="muted">${esc(a.r||"")}</div></li>`).join("")}</ol>
+   ${q.hint?`<p class="muted">💡 ${esc(q.hint)}</p>`:""}<p class="muted" style="font-size:11px">出典: ${esc(q.src||"")}</p>
+   <div class="row"><button class="btn small" data-a="flag">${S.flags[id]?"疑義ありを解除":"⚑ 疑義あり（出題停止）"}</button>
+   <button class="btn small" data-a="reset">この問題の記録をリセット</button>
+   ${custom?'<button class="btn small danger" data-a="del">削除</button>':""}</div>`;
+  el.appendChild(box);
+  box.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
+    const a=b.dataset.a;
+    if(a==="flag"){ if(S.flags[id]) delete S.flags[id]; else S.flags[id]={at:today()}; }
+    if(a==="reset"){ delete S.cards[id]; toast("リセットしました"); }
+    if(a==="del"){ if(!confirm("この問題を削除しますか？")) return; S.custom=S.custom.filter(x=>x.id!==id); delete S.cards[id]; delete S.flags[id]; rebuildMap(); }
+    save(); renderLib();
+  });
+}
+["libSearch","libCat","libStatus"].forEach(i=>$(i).addEventListener("input",renderLib));
+
+/* ---------- add / import ---------- */
+function renderAdd(){
+  const cs=allCats();
+  if(!$("pCat").options.length){
+    $("pCat").innerHTML='<option value="">おまかせ（バランスよく）</option>'+cs.map(c=>`<option>${esc(c)}</option>`).join("");
+    $("impDefCat").innerHTML=cs.map(c=>`<option>${esc(c)}</option>`).join("");
+  }
+  updatePNote();
+}
+function weakCats(){
+  return allCats().map(cat=>{let s=0,o=0;activeQ().filter(q=>q.cat===cat).forEach(q=>{const c=card(q.id);s+=c.seen;o+=c.ok;});return {cat,p:s>=3?o/s:null};})
+    .filter(x=>x.p!==null).sort((a,b)=>a.p-b.p).slice(0,3);
+}
+function updatePNote(){
+  const f=$("pFocus").value;
+  const w=weakCats();
+  $("pNote").textContent = f==="latest" ? "最新トピックは、Web検索できるAI（Gemini、検索をオンにしたClaudeなど）で作ると事実確認が確実です。時点（asOf）付きで取り込まれ、出題時に「○年時点の情報」と表示されます。"
+    : f==="weak" ? (w.length? "正答率の低い分野："+w.map(x=>x.cat+"（"+Math.round(x.p*100)+"%）").join("、")+" を重点にします。" : "まだ分野別の記録が少ないため、バランスよく作成します。")
+    : f==="deep" ? "あなたが間違えた問題の答えをAIに伝え、その周辺知識を問う新しい問題を作ってもらいます。"
+    : "既存の問題の答え一覧をプロンプトに含めるので、重複しにくくなります。";
+}
+$("pFocus").onchange=updatePNote;
+function buildPrompt(){
+  const n=$("pCount").value, cat=$("pCat").value, f=$("pFocus").value, lv=$("pLevel").value;
+  const cats=allCats();
+  const answers=[...new Set(allQ().map(q=>q.a[0].t))];
+  let focus="";
+  if(f==="latest") focus=`- 直近2〜3年（現在は${today().slice(0,4)}年）の科学的発見、ノーベル賞などの受賞、国際的な出来事、新しく定まった名称・制度などから出題する。Web検索が使える場合は必ず検索して事実を確認すること。\n- すべての問題に asOf（例: "${today().slice(0,4)}年"）を付ける。\n- 政治的に評価が分かれる事柄は、事実関係のみを問う（賛否や評価は問わない）。`;
+  else if(f==="weak"){ const w=weakCats(); focus = w.length? `- 次の分野を重点的に（全体の7割程度）: ${w.map(x=>x.cat).join("、")}` : ""; }
+  else if(f==="deep"){
+    const miss=activeQ().filter(q=>{const c=card(q.id);return c.seen&&isWeak(c);}).slice(0,15).map(q=>q.a[0].t);
+    focus = miss.length? `- 私が最近間違えた・あやふやだった項目は次の通り。これらと関連する周辺知識（同時代の出来事、対になる概念、同じ人物の別の業績など）を問う新しい問題を作る。答えそのものが同じ問題は作らない: ${miss.join("、")}` : "- 教養として重要だが見落とされがちな事柄から出題する。";
+  }
+  return `あなたは大人向けの「一般常識・博識クイズ」の作問者です。記憶力と教養を保つための4択問題を${n}問作成し、指定のJSONだけを出力してください。
+
+# 条件
+- 分野: ${cat||"次の分野からバランスよく: "+cats.filter(c=>c!=="最新トピック"||f==="latest").join("、")}
+- 難易度: ${lv}${lv==="超・上級"?"（大学教養〜教養人レベル。ただし重箱の隅ではなく「知っていると世界の見え方が変わる」知識）":""}
+${focus}
+- 4択で正解はちょうど1つ。誤答は同じ分野・同じ時代・同じ種類からもっともらしいものを選ぶ。
+- 事実の正確さを最優先する。諸説ある事柄、「唯一」「最初」「最大」などの断定は、確実な場合だけ使い、必要なら解説で「諸説あり」と明記する。
+- 引っかけ問題、「該当なし」が正解になる問題、問題文に答えが含まれる問題は作らない。
+- 各選択肢に解説 r を付ける。正解の解説は背景知識を含めて1〜2文、誤答の解説はその選択肢が何であるかを1文で。
+- hint は答えを直接書かない1文のヒント。
+- 時間とともに変わりうる内容（現職、記録、人口、最新研究など）には asOf に基準時点（例: "2026年"）を入れる。
+- 次の答えを持つ問題とは重複させない: ${answers.join("、")}
+
+# 出力形式（このJSONのみ。a の先頭が必ず正解）
+{"questions":[{"cat":"分野名","q":"問題文","a":[{"t":"正解","r":"解説"},{"t":"誤答1","r":"解説"},{"t":"誤答2","r":"解説"},{"t":"誤答3","r":"解説"}],"hint":"ヒント","asOf":"必要な場合のみ"}]}
+分野名は次のいずれか: ${cats.join("、")}`.replace(/\n{3,}/g,"\n\n").replace(/\n\n- 4択/,"\n- 4択");
+}
+const CHECK_PROMPT=`次のクイズJSONを検証してください。各問題について、(1)正解が事実として正しいか、(2)誤答の中に正解とも言えるものが混じっていないか、(3)解説やヒントに誤りがないか、(4)問題文だけで答えが一つに定まるか、を確認してください。
+問題があったものは修正し、修正できないものは削除したうえで、同じ形式の修正版JSONだけを出力してください（a の先頭が正解）。最後に、修正・削除した問題とその理由を箇条書きでJSONの後に添えてください。
+
+[ここにJSONを貼り付け]`;
+$("pCopy").onclick=async()=>toast(await copyText(buildPrompt())?"プロンプトをコピーしました":"コピーできませんでした");
+$("pCopyCheck").onclick=async()=>toast(await copyText(CHECK_PROMPT)?"検証用プロンプトをコピーしました":"コピーできませんでした");
+
+function parseImport(text,defCat){
+  let t=text.trim().replace(/^```[\w]*\s*/m,"").replace(/```\s*$/m,"");
+  const s=t.search(/[\[{]/); if(s<0) throw new Error("JSONが見つかりません");
+  t=t.slice(s); const e=Math.max(t.lastIndexOf("}"),t.lastIndexOf("]")); t=t.slice(0,e+1);
+  let d=JSON.parse(t);
+  const arr=Array.isArray(d)?d:(d.questions||[]);
+  const ok=[],bad=[];
+  arr.forEach((x,i)=>{
+    try{
+      let qtext=x.q||x.question, opts;
+      if(Array.isArray(x.a)) opts=x.a.map((o,j)=>({t:o.t??o.text,r:o.r??o.rationale??"",c:o.c??o.isCorrect??(j===0)}));
+      else if(Array.isArray(x.answerOptions)) opts=x.answerOptions.map(o=>({t:o.text,r:o.rationale||"",c:!!o.isCorrect}));
+      else if(Array.isArray(x.options)) opts=x.options.map(o=>({t:o,r:o===x.answer?(x.explanation||""):"",c:o===x.answer}));
+      else throw new Error("選択肢がありません");
+      if(!qtext) throw new Error("問題文がありません");
+      if(Array.isArray(x.a) && opts.some((o,j)=>j>0&&o.c===true)) { /* explicit flags */ opts.forEach((o,j)=>{if(x.a[j].c===undefined&&x.a[j].isCorrect===undefined)o.c=false;}); }
+      const nc=opts.filter(o=>o.c).length;
+      if(nc!==1) throw new Error("正解が"+nc+"個あります");
+      if(opts.length<2||opts.some(o=>!o.t)) throw new Error("選択肢が不正です");
+      opts.sort((a,b)=>b.c-a.c);
+      const q={id:"u"+Date.now().toString(36)+i.toString(36)+Math.random().toString(36).slice(2,5),cat:String(x.cat||x.category||defCat),q:String(qtext).replace(/\$([^$]*)\$/g,"$1").replace(/\\%/g,"%"),
+        a:opts.map(o=>({t:String(o.t),r:String(o.r||"")})),hint:String(x.hint||""),src:"追加 "+today()};
+      if(x.asOf) q.asOf=String(x.asOf);
+      ok.push(q);
+    }catch(err){ bad.push((i+1)+"問目: "+err.message); }
+  });
+  return {ok,bad};
+}
+let pending=null;
+$("impCheck").onclick=()=>{
+  const box=$("impPreview");
+  try{
+    const {ok,bad}=parseImport($("impText").value,$("impDefCat").value);
+    const exist=new Set(allQ().map(q=>norm(q.q))), existAns=new Set(allQ().map(q=>norm(q.a[0].t)));
+    const fresh=[],dup=[]; ok.forEach(q=>(exist.has(norm(q.q))||fresh.some(f=>norm(f.q)===norm(q.q))?dup:fresh).push(q));
+    const sameAns=fresh.filter(q=>existAns.has(norm(q.a[0].t)));
+    pending=fresh;
+    box.innerHTML=`<div class="note">取り込める問題 <b>${fresh.length}</b>問${dup.length?`・重複のため除外 ${dup.length}問`:""}${bad.length?`・読めなかった問題 ${bad.length}問`:""}</div>
+      ${bad.length?`<p class="muted" style="font-size:12px">${bad.map(esc).join("<br>")}</p>`:""}
+      ${sameAns.length?`<p class="note warn" style="margin-top:8px">既存問題と答えが同じ問題が ${sameAns.length}問あります（問い方が違えば有効です）: ${sameAns.map(q=>esc(q.a[0].t)).join("、")}</p>`:""}
+      <div class="qlist" style="margin-top:8px">${fresh.slice(0,50).map(q=>`<div class="qitem" style="cursor:default"><div class="t">${esc(q.q)}</div><div class="m"><span>${esc(q.cat)}</span><span>✓ ${esc(q.a[0].t)}</span>${q.asOf?`<span>${esc(q.asOf)}時点</span>`:""}</div></div>`).join("")}</div>
+      ${fresh.length?`<button class="btn primary big" id="impGo" style="margin-top:12px">${fresh.length}問を追加する</button>`:""}`;
+    if($("impGo")) $("impGo").onclick=()=>{
+      S.custom=S.custom.concat(pending); save(); rebuildMap();
+      $("libCat").innerHTML=""; $("pCat").innerHTML="";
+      toast(pending.length+"問を追加しました"); pending=null; $("impText").value=""; box.innerHTML=""; renderAdd();
+    };
+  }catch(err){ box.innerHTML=`<div class="note warn">読み込めませんでした：${esc(err.message)}</div>`; }
+};
+
+/* ---------- settings ---------- */
+function renderSet(){
+  $("sSize").value=S.settings.size; $("sNew").value=S.settings.newPerDay;
+  $("sRecall").checked=S.settings.recall; $("sHintHard").checked=S.settings.hintHard;
+  $("bLast").textContent=S.lastBackup?"最後のバックアップ: "+S.lastBackup.replace("T"," ").slice(0,16):"まだバックアップしていません";
+  $("verInfo").textContent="内蔵 "+BANK.length+"問＋追加 "+S.custom.length+"問（"+BANK_VERSION+"）";
+}
+$("sSize").onchange=e=>{S.settings.size=Math.min(50,Math.max(5,+e.target.value||10));save();renderSet();};
+$("sNew").onchange=e=>{S.settings.newPerDay=Math.min(100,Math.max(0,+e.target.value||0));save();renderSet();};
+$("sRecall").onchange=e=>{S.settings.recall=e.target.checked;save();};
+$("sHintHard").onchange=e=>{S.settings.hintHard=e.target.checked;save();};
+$("bExport").onclick=()=>{
+  const now=new Date(); S.lastBackup=ymd(now)+"T"+now.toTimeString().slice(0,8); save();
+  const blob=new Blob([JSON.stringify({app:"memoria-sapientia",v:1,exported:S.lastBackup,state:S},null,1)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="memoria-sapientia-backup-"+today()+".json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  renderSet(); toast("書き出しました");
+};
+$("bImport").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(d.app!=="memoria-sapientia"||!d.state) throw new Error();
+    if(!confirm("現在の記録をバックアップの内容で置き換えます。よろしいですか？\n（"+(d.exported||"")+" 時点・追加問題 "+(d.state.custom||[]).length+"問）")) return;
+    const b=blankState(); S=Object.assign(b,d.state,{settings:Object.assign(b.settings,d.state.settings||{})}); save(); rebuildMap();
+    $("libCat").innerHTML=""; $("pCat").innerHTML="";
+    toast("復元しました"); renderSet();
+  }catch(_){ toast("このファイルは読み込めません"); }
+  e.target.value="";
+};
+$("rstProgress").onclick=()=>{ if(confirm("学習記録（正誤・出題間隔・日々の記録）を消します。追加した問題は残ります。")){ S.cards={}; S.log={}; save(); toast("学習記録を消しました"); } };
+$("rstAll").onclick=()=>{ if(confirm("追加した問題も含めてすべて初期化します。元に戻せません。")){ S=blankState(); save(); rebuildMap(); $("libCat").innerHTML=""; $("pCat").innerHTML=""; renderSet(); toast("初期化しました"); } };
+
+tab("home");
+</script>
+</body>
+</html>
