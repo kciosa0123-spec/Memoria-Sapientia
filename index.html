@@ -138,6 +138,7 @@ label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
 
   <!-- HOME -->
   <section id="v-home">
+    <div id="resumeNote"></div>
     <div class="kpis">
       <div class="kpi"><b id="kStreak">0</b><span>連続日数</span></div>
       <div class="kpi"><b id="kToday">0</b><span>今日解いた問題</span></div>
@@ -173,7 +174,7 @@ label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
   <!-- QUIZ -->
   <section id="v-quiz" class="hide">
     <div class="qhead">
-      <button class="btn small ghost" id="quitBtn" title="中断">✕</button>
+      <button class="btn small" id="quitBtn">中断して戻る</button>
       <div class="prog"><i id="progBar"></i></div>
       <span class="muted" id="progText" style="font-size:13px;font-variant-numeric:tabular-nums"></span>
     </div>
@@ -495,6 +496,7 @@ function renderHome(){
   $("dailyInfo").textContent= planned
     ? "復習期限の問題 "+due+"問・新しい問題 残り"+nw+"問"+(due>S.settings.size?"（セットを繰り返すと残りも出題されます）":"")+(dueIn?"":"")
     : (unseen? "新規問題は1日の上限に達しました。下のモードで追加練習できます。" : "全問題を出題済みです。「問題を追加」から新しい問題を増やせます。");
+  renderResume();
   // backup reminder
   const custN=S.custom.length, seenN=Object.keys(S.cards).length;
   const days = S.lastBackup? dayDiff(S.lastBackup.slice(0,10),today()) : null;
@@ -533,10 +535,44 @@ $("catPick").onchange=e=>{ if(e.target.value) startSession("cat",e.target.value)
 /* ---------- quiz ---------- */
 let Q=null; // session
 function startSession(mode,arg){
+  if(getResume() && !confirm("中断したセットがあります。新しく始めると、中断したセットは破棄されます（解答済みの記録は残ります）。よろしいですか？")) return;
   const items=buildSession(mode,arg);
   if(!items.length){ toast(mode==="weak"?"まだ解いた問題がありません":"出題できる問題がありません"); return; }
   Q={mode,arg,queue:items.map(q=>({id:q.id,retry:0})),pos:0,total:items.length,results:{},order:items.map(q=>q.id),answered:false,hintUsed:false};
+  clearResume();
   show("quiz"); renderQ();
+}
+/* ---------- 中断・再開 ---------- */
+const RESUME_KEY=KEY+"-resume";
+function getResume(){ try{ return JSON.parse(localStorage.getItem(RESUME_KEY)); }catch(e){ return null; } }
+function clearResume(){ try{ localStorage.removeItem(RESUME_KEY); }catch(e){} }
+function suspend(){
+  // 解答済み（評価ボタンまで押した）問題は記録済み。表示中の問題とその先を保存する
+  const rest=Q.queue.slice(Q.pos);
+  if(rest.length){
+    try{ localStorage.setItem(RESUME_KEY,JSON.stringify({mode:Q.mode,arg:Q.arg,queue:rest,total:Q.total,results:Q.results,order:Q.order,at:new Date().toISOString()})); }catch(e){}
+  }
+  Sync.soon(0);
+  tab("home");
+}
+function resumeSession(){
+  const r=getResume(); if(!r) return;
+  const queue=r.queue.filter(it=>QMAP[it.id] && !flagged(it.id));
+  if(!queue.length){ clearResume(); renderHome(); return; }
+  Q={mode:r.mode,arg:r.arg,queue,pos:0,total:r.total,results:r.results||{},order:r.order.filter(id=>QMAP[id]),answered:false,hintUsed:false};
+  clearResume();
+  show("quiz"); renderQ();
+}
+function renderResume(){
+  const r=getResume(), box=$("resumeNote");
+  if(!r){ box.innerHTML=""; return; }
+  const done=Object.keys(r.results||{}).length;
+  const left=r.queue.filter(it=>QMAP[it.id]&&!it.retry&&!(it.id in (r.results||{}))).length, rt=r.queue.filter(it=>QMAP[it.id]&&it.retry).length;
+  const label={daily:"今日の学習",weak:"苦手特訓",random:"ランダム",cat:"カテゴリ別"+(r.arg?"（"+r.arg+"）":""),latest:"最新トピック"}[r.mode]||"";
+  box.innerHTML=`<div class="card" style="border-color:var(--accent)"><div class="row"><div class="grow"><b>中断したセットがあります</b><div class="sub" style="font-size:13px">${esc(label)}・${done}問解答済み・残り${left}問${rt?"＋再挑戦"+rt+"問":""}</div></div>
+    <button class="btn small ghost" id="resDiscard">破棄</button><button class="btn primary" id="resGo">続きから</button></div></div>`;
+  $("resGo").onclick=resumeSession;
+  $("resDiscard").onclick=()=>{ if(confirm("中断したセットを破棄しますか？（解答済みの記録は残ります）")){ clearResume(); renderResume(); } };
 }
 function renderQ(){
   const it=Q.queue[Q.pos], q=QMAP[it.id];
@@ -627,7 +663,7 @@ function finish(){
 }
 $("rHome").onclick=()=>tab("home");
 $("rAgain").onclick=()=>startSession(Q.mode,Q.arg);
-$("quitBtn").onclick=()=>{ if(Object.keys(Q.results).length) finish(); else tab("home"); };
+$("quitBtn").onclick=suspend;
 document.addEventListener("keydown",e=>{
   if($("v-quiz").classList.contains("hide")||e.ctrlKey||e.metaKey||e.altKey) return;
   const k=e.key;
